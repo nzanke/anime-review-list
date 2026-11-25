@@ -66,6 +66,7 @@ details>summary::-webkit-details-marker{display:none}
 details>summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(-45deg);flex:none;margin:0 4px 0 2px;transition:transform .12s}
 details[open]>summary::before{transform:rotate(45deg)}
 .dec{border-bottom:1px solid var(--line)}
+.dec{scroll-margin-top:56px}
 .dec>summary{font-weight:700;font-size:17px;padding:10px 2px;color:var(--acc)}
 .cnt{margin-left:auto;font-size:12px;color:var(--sub);font-weight:400;display:inline-flex;align-items:center;gap:3px}
 .yr{margin-left:12px;border-top:1px solid var(--line)}
@@ -132,8 +133,11 @@ form.f{background:var(--acc-pale);border:1px solid var(--acc);border-radius:8px;
 form.f label{display:grid;grid-template-columns:5.5em 1fr;align-items:center;gap:6px;font-size:13px}
 form.f input[type=text],form.f input[type=number],form.f input[type=url],form.f select{width:100%;padding:6px 7px;border:1px solid var(--line);border-radius:5px;background:#fff}
 form.f .seg{display:flex;gap:4px}
-form.f .seg label{display:flex;gap:4px;border:1px solid var(--line);background:#fff;border-radius:5px;padding:4px 10px;cursor:pointer}
+form.f .lb{display:inline-flex;align-items:center;gap:3px;min-width:0}
+form.f .seg{flex-wrap:wrap}
+form.f .seg label{white-space:nowrap;font-size:13px;display:flex;gap:4px;border:1px solid var(--line);background:#fff;border-radius:5px;padding:4px 10px;cursor:pointer}
 form.f .seg input{margin:0}
+form.f .metast{font-size:12px;color:var(--acc);margin:-3px 0 0 5.5em}
 form.f .btns{display:flex;gap:6px;justify-content:flex-end}
 form.f .btns button{border:1px solid var(--acc);border-radius:6px;padding:5px 14px;cursor:pointer;background:#fff;color:var(--acc);display:inline-flex;align-items:center;gap:4px}
 form.f .btns button[type=submit]{background:var(--acc);color:#fff}
@@ -260,6 +264,7 @@ let onlyRv=LS.get('arl-onlyrv',false);
 let SOSHU={};   // 総集編の作品 {作品ID:[題名,年]}（data/soshu.json）
 let showSoshu=LS.get('arl-soshu',true);
 const openSet=new Set(LS.get('arl-open',[]));
+for(const k of ['movie','tv']){const ds=[...openSet].filter(x=>x.startsWith(k+'-d'));ds.slice(0,-1).forEach(x=>openSet.delete(x))}
 
 /* ---------- 読み込み ---------- */
 async function getFile(path,fresh){
@@ -396,6 +401,12 @@ function render(){
   }
   $('#list').innerHTML=h;
   for(const id of openSet){const m=id.match(/^(movie|tv)-y(\d+)$/); if(m&&m[1]===k&&openSet.has(`${k}-d${Math.floor(m[2]/10)*10}`)&&!(CAT[k+'/'+m[2]]&&UD[k+'/'+m[2]])) loadYear(k,m[2])}
+  for(const lb of document.querySelectorAll('#list form.f label')){
+    if(lb.closest('.seg')||lb.querySelector(':scope>.lb')) continue;
+    const sp=document.createElement('span'); sp.className='lb';
+    while(lb.firstChild&&!(lb.firstChild.nodeType===1&&/^(INPUT|SELECT)$/.test(lb.firstChild.tagName))) sp.appendChild(lb.firstChild);
+    lb.prepend(sp);
+  }
   const f=$('#list form.f input[type=text]'); if(f&&document.activeElement.tagName!=='INPUT') f.focus();
 }
 async function loadYear(k,y){
@@ -537,6 +548,7 @@ function rvForm(e){
     const t=(e.v&&e.v.type)||'ndl', sh=(...ks)=>ks.includes(t)?'':' hidden';
     return `<form class="f" data-form="sr">
   <div class="seg">${Object.entries(SRT).map(([k,[n,i]])=>`<label><input type="radio" name="type" value="${k}"${t===k?' checked':''}>${ic(i)}${n}</label>`).join('')}</div>
+  <label>${ic('link')}URL<input type="url" name="url" data-req="ndl" placeholder="${t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（ネット記事は貼ると題名などを自動で入れます）'}" value="${val(e,'url')}"${t==='ndl'?' required':''}></label>
   <label>${ic('person')}著者名<input type="text" name="author" placeholder="任意" value="${val(e,'author')}"></label>
   <label><span data-tl>${t==='ndl'?'記事名':'タイトル'}</span><input type="text" name="title" data-req="web book" placeholder="${t==='ndl'?'任意（「」で囲んで表示）':''}" value="${val(e,'title')}"${t==='ndl'?'':' required'}></label>
   <label data-k="ndl"${sh('ndl')}>${ic('book')}書籍名<input type="text" name="book" data-req="ndl" placeholder="必須（『』で囲んで表示）" value="${val(e,'book')}"${t==='ndl'?' required':''}></label>
@@ -545,19 +557,18 @@ function rvForm(e){
   <label data-k="book ndl"${sh('book','ndl')}>${ic('cal')}発行年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
   <label data-k="web"${sh('web')}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
   <label data-k="ndl"${sh('ndl')}>ページ<input type="text" name="pages" placeholder="任意（例：12、15、20）" value="${val(e,'pages')}"></label>
-  <label>${ic('link')}URL<input type="url" name="url" data-req="ndl" placeholder="${t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（任意）'}" value="${val(e,'url')}"${t==='ndl'?' required':''}></label>
   ${btns}</form>`;
   }
   const web=e.v&&e.v.type==='web', iv=false;
-  return `<form class="f" data-form="art"><label>${ic(iv?'mic':'person')}${iv?'話し手':'著者名'}<input type="text" name="author" value="${val(e,'author')}"${iv?' placeholder="インタビューを受けた人"':''}></label>
+  return `<form class="f" data-form="art"><div class="seg"><label><input type="radio" name="type" value="paper"${web?'':' checked'}>${ic('book')}紙の媒体</label><label><input type="radio" name="type" value="web"${web?' checked':''}>${ic('globe')}ネット</label></div>
+  <label>${ic('link')}URL<input type="url" name="url" placeholder="${web?'https://（貼ると題名などを自動で入れます）':'https://（任意）'}" value="${val(e,'url')}"></label>
+  <label>${ic(iv?'mic':'person')}${iv?'話し手':'著者名'}<input type="text" name="author" value="${val(e,'author')}"${iv?' placeholder="インタビューを受けた人"':''}></label>
   ${iv?`<label>${ic('person')}聞き手<input type="text" name="inter" placeholder="聞き手・構成（任意）" value="${val(e,'inter')}"></label>`:''}
   <label>タイトル<input type="text" name="title" required value="${val(e,'title')}"></label>
-  <div class="seg"><label><input type="radio" name="type" value="paper"${web?'':' checked'}>${ic('book')}紙の媒体</label><label><input type="radio" name="type" value="web"${web?' checked':''}>${ic('globe')}ネット</label></div>
   <label><span data-lbl>${web?'メディア名':'媒体名'}</span><input type="text" name="media" required value="${val(e,'media')}"></label>
   <label data-paper${web?' hidden':''}>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
   <label data-paper${web?' hidden':''}>${ic('cal')}発表年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
   <label data-web${web?'':' hidden'}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
-  <label>${ic('link')}URL<input type="url" name="url" placeholder="https://（任意）" value="${val(e,'url')}"></label>
   ${btns}</form>`;
 }
 function awForm(e){
@@ -647,7 +658,7 @@ document.addEventListener('change',ev=>{
     f.querySelector('[data-tl]').textContent=t==='ndl'?'記事名':'タイトル';
     f.querySelector('[name=title]').placeholder=t==='ndl'?'任意（「」で囲んで表示）':'';
     f.querySelector('[data-ml]').textContent=t==='web'?'メディア名':'媒体名';
-    f.querySelector('[name=url]').placeholder=t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（任意）';
+    f.querySelector('[name=url]').placeholder=t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':t==='web'?'https://（貼ると題名などを自動で入れます）':'https://（任意）';
     return;
   }
   if(ev.target.name==='type'){
@@ -655,6 +666,7 @@ document.addEventListener('change',ev=>{
     f.querySelector('[data-lbl]').textContent=web?'メディア名':'媒体名';
     f.querySelectorAll('[data-paper]').forEach(x=>x.hidden=web);
     f.querySelectorAll('[data-web]').forEach(x=>x.hidden=!web);
+    f.querySelector('[name=url]').placeholder=web?'https://（貼ると題名などを自動で入れます）':'https://（任意）';
   }
 });
 document.addEventListener('submit',async ev=>{
@@ -722,12 +734,59 @@ document.addEventListener('toggle',ev=>{
   const id=d.dataset.id;
   if(d.open===openSet.has(id)) return;
   if(d.open) openSet.add(id); else openSet.delete(id);
+  let closedOther=false;
+  if(d.open&&d.classList.contains('dec')){
+    for(const x of [...openSet]) if(x!==id&&x.startsWith(kind+'-d')){openSet.delete(x);closedOther=true}
+  }
   saveOpen();
   if(!d.open) return;
   if(d.classList.contains('work')){const c=ctx(d); if(c&&c.w&&!d.querySelector('.wbody')) d.insertAdjacentHTML('beforeend',workBody(c.w,c.y))}
   else if(d.classList.contains('yr')){const y=d.dataset.y; if(!(CAT[kind+'/'+y]&&UD[kind+'/'+y])) {render();loadYear(kind,y)} else render()}
-  else render();
+  else{
+    render();
+    // 上の年代を閉じて位置がずれたら、開いた年代の見出しが画面の上に来るようにする
+    if(closedOther){const el=document.querySelector(`details.dec[data-id="${id}"]`); if(el&&el.getBoundingClientRect().top<0) el.scrollIntoView({block:'start'})}
+  }
 },true);
+/* ネット記事：URL を入れると題名・サイト名・著者・日付を自動で入れる（Microlink の無料枠。空いている欄だけ埋める） */
+let metaTimer=null;
+document.addEventListener('input',ev=>{
+  const u=ev.target; if(u.name!=='url'||!u.form) return;
+  const f=u.form, t=f.querySelector('input[name=type]:checked');
+  if(!t||t.value!=='web') return;
+  clearTimeout(metaTimer);
+  if(!/^https?:\/\/[^\s]+\.[^\s]+/.test(u.value.trim())) return;
+  metaTimer=setTimeout(()=>fillMeta(f,u.value.trim()),500);
+});
+function metaNote(f,msg){
+  let n=f.querySelector('.metast');
+  if(!n){n=document.createElement('div');n.className='metast';f.querySelector('[name=url]').closest('label').after(n)}
+  n.textContent=msg;
+}
+async function fillMeta(f,url){
+  metaNote(f,'記事の情報を読み込み中…');
+  try{
+    const r=await fetch('https://api.microlink.io/?url='+encodeURIComponent(url));
+    const j=await r.json();
+    if(j.status!=='success') throw new Error(j.message||r.status);
+    if(f.querySelector('[name=url]').value.trim()!==url) return;
+    const d=j.data||{}, got=[];
+    let site=(d.publisher||'').trim(), title=(d.title||'').trim();
+    if(!site){try{site=new URL(url).hostname.replace(/^www\./,'')}catch(e){}}
+    // 題名の末尾についたサイト名（「題名 | サイト名」など）を外す
+    for(const sep of [' | ','｜',' - ',' – ',' — ',' :: ','│']){
+      const i=title.lastIndexOf(sep);
+      if(i>0){const tail=title.slice(i+sep.length).trim(); if(site&&(tail.includes(site)||site.includes(tail))){title=title.slice(0,i).trim();break}}
+    }
+    const put=(name,v,label)=>{const x=f.querySelector(`[name=${name}]`); if(x&&v&&!x.value.trim()){x.value=v;got.push(label)}};
+    put('title',title,'題名'); put('media',site,'サイト名');
+    if(d.author&&!/^https?:/.test(d.author)) put('author',d.author.trim(),'著者');
+    if(d.date){const dt=new Date(d.date); if(!isNaN(dt)) put('date',`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`,'日付')}
+    metaNote(f,got.length?`自動で入れました：${got.join('・')}（違っていたら直してください）`:'自動で入れられる情報がありませんでした（入れ済みの欄はそのままです）');
+  }catch(e){
+    metaNote(f,'記事の情報を読み込めませんでした。手で入れてください（'+e.message+'）');
+  }
+}
 window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);setKind(k==='movie'||k==='tv'?k:null)});
 
 /* ---------- 起動 ---------- */
