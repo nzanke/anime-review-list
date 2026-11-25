@@ -187,6 +187,7 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
 </svg>
 
@@ -279,14 +280,14 @@ async function ensureYear(k,y){
   CAT[key]=c||[]; UD[key]=Object.assign(emptyUD(),u||{});
 }
 function ud(k,y){return UD[k+'/'+y]}
-function slot(k,y,id){const u=ud(k,y);return u.w[id]=u.w[id]||{rv:[],aw:[]}}
+function slot(k,y,id){const u=ud(k,y);const s=u.w[id]=u.w[id]||{rv:[],aw:[]};s.iv=s.iv||[];return s}
 /* 台帳と編集を合わせた作品の一覧 */
 function works(k,y){
   const key=k+'/'+y, u=UD[key]; if(!u||!CAT[key]) return [];
   const hide=new Set(u.hide), list=[];
   const mk=(id,title,md,studio,dir,added,cour,min)=>{
     const f=u.fix[id]||{}, s=u.w[id]||{};
-    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title,min:min||0,soshu:!!SOSHU[id]};
+    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],iv:s.iv||[],orig:title,min:min||0,soshu:!!SOSHU[id]};
   };
   for(const [id,t,md,st,dr,mn] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false,null,mn));
   for(const a of u.add) list.push(mk(a.id,a.title,a.md||'','','',true,a.cour));
@@ -302,12 +303,12 @@ function hiddenWorks(k,y){
 let syncTimer=null, syncing=false;
 function markDirty(k,y){
   const u=ud(k,y);
-  for(const id in u.w){if(!u.w[id].rv.length&&!u.w[id].aw.length) delete u.w[id]}
+  for(const id in u.w){const x=u.w[id];if(x.iv&&!x.iv.length) delete x.iv;if(!x.rv.length&&!x.aw.length&&!(x.iv||[]).length) delete u.w[id]}
   for(const id in u.fix){if(!u.fix[id].title&&!u.fix[id].cour) delete u.fix[id]}
-  let r=0,a=0; for(const id in u.w){r+=u.w[id].rv.length;a+=u.w[id].aw.length}
+  let r=0,a=0,iv=0; for(const id in u.w){r+=u.w[id].rv.length;a+=u.w[id].aw.length;iv+=(u.w[id].iv||[]).length}
   const empty=!u.add.length&&!u.hide.length&&!Object.keys(u.w).length&&!Object.keys(u.fix).length;
   if(empty){delete UIDX[k][y];pending[uPath(k,y)]=null}
-  else{UIDX[k][y]={a:u.add.length,h:u.hide.length,r,w:a};pending[uPath(k,y)]=JSON.stringify(u,null,1)}
+  else{UIDX[k][y]={a:u.add.length,h:u.hide.length,r,w:a,i:iv};pending[uPath(k,y)]=JSON.stringify(u,null,1)}
   pending['data/index.json']=JSON.stringify(UIDX,null,1);
   LS.set('arl-pending',pending);
   scheduleSync();
@@ -365,27 +366,27 @@ function yearCount(k,y){const u=UIDX[k][y]||{};return (CIDX[k][y]||0)+(u.a||0)-(
 function decades(k){
   const ys=new Set([...Object.keys(CIDX[k]),...Object.keys(UIDX[k]).filter(y=>UIDX[k][y].a)]);
   const m={};
-  for(const y of ys){if(onlyRv&&!(UIDX[k][y]||{}).r&&!(UIDX[k][y]||{}).w) continue;const d=Math.floor(y/10)*10;(m[d]=m[d]||[]).push(+y)}
+  for(const y of ys){if(onlyRv&&!(UIDX[k][y]||{}).r&&!(UIDX[k][y]||{}).w&&!(UIDX[k][y]||{}).i) continue;const d=Math.floor(y/10)*10;(m[d]=m[d]||[]).push(+y)}
   return Object.entries(m).map(([d,ys])=>[+d,ys.sort((a,b)=>b-a)]).sort((a,b)=>b[0]-a[0]);
 }
 const op=id=>openSet.has(id)?' open':'';
 const kIcon=k=>ic(k==='tv'?'tv':'film');
-function cntHtml(k,n,r,w){return `<span class="cnt">${r?`<span class="rc" style="color:var(--acc);font-weight:700">${ic('doc')}${r}</span>`:''}${w?`<span style="color:var(--gold)">${ic('trophy')}${w}</span>`:''}${n==null?'':kIcon(k)+n}</span>`}
+function cntHtml(k,n,r,w,i){return `<span class="cnt">${r?`<span class="rc" style="color:var(--acc);font-weight:700">${ic('doc')}${r}</span>`:''}${i?`<span style="color:var(--acc);font-weight:700">${ic('mic')}${i}</span>`:''}${w?`<span style="color:var(--gold)">${ic('trophy')}${w}</span>`:''}${n==null?'':kIcon(k)+n}</span>`}
 function render(){
   if(!CIDX||!kind) return;
   const k=kind, decs=decades(k);
-  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}レビューのある作品だけ</button><button class="flt" data-act="showSoshu" aria-pressed="${showSoshu}" title="総集編・再編集版の表示を切り替える">${ic('layers')}総集編を表示</button>`;
+  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}記事のある作品だけ</button><button class="flt" data-act="showSoshu" aria-pressed="${showSoshu}" title="総集編・再編集版の表示を切り替える">${ic('layers')}総集編を表示</button>`;
   if(editMode&&!(editing&&editing.t==='work'&&editing.isNew&&editing.top)) h+=`<button class="add" data-act="addWork" data-top="1">${ic('plus')}台帳にない作品を追加</button>`;
   h+='</div>';
   if(editMode&&editing&&editing.t==='work'&&editing.isNew&&editing.top) h+=workForm(editing);
   if(!decs.length) h+=`<div class="notice">${onlyRv?'レビューのある作品はまだありません。':'作品がありません。'}</div>`;
   for(const [d,ys] of decs){
-    let n=0,r=0,w=0; for(const y of ys){n+=yearCount(k,y);r+=(UIDX[k][y]||{}).r||0;w+=(UIDX[k][y]||{}).w||0}
+    let n=0,r=0,w=0,iv=0; for(const y of ys){n+=yearCount(k,y);r+=(UIDX[k][y]||{}).r||0;w+=(UIDX[k][y]||{}).w||0;iv+=(UIDX[k][y]||{}).i||0}
     const did=`${k}-d${d}`;
-    h+=`<details class="dec" data-id="${did}"${op(did)}><summary>${d}年代${cntHtml(k,onlyRv?null:n,r,w)}</summary>`;
+    h+=`<details class="dec" data-id="${did}"${op(did)}><summary>${d}年代${cntHtml(k,onlyRv?null:n,r,w,iv)}</summary>`;
     if(openSet.has(did)) for(const y of ys){
       const yid=`${k}-y${y}`, key=k+'/'+y, u=UIDX[k][y]||{};
-      h+=`<details class="yr" data-id="${yid}" data-y="${y}"${op(yid)}><summary>${y}年${cntHtml(k,onlyRv?null:yearCount(k,y),u.r,u.w)}</summary>`;
+      h+=`<details class="yr" data-id="${yid}" data-y="${y}"${op(yid)}><summary>${y}年${cntHtml(k,onlyRv?null:yearCount(k,y),u.r,u.w,u.i)}</summary>`;
       if(openSet.has(yid)) h+= CAT[key]&&UD[key]?yearBody(k,y):'<div class="loading">読み込み中…</div>';
       h+='</details>';
     }
@@ -401,7 +402,7 @@ async function loadYear(k,y){
   try{await ensureYear(k,y)}catch(e){toast('読み込めませんでした');console.error(e)}
   loadingYears.delete(key); render();
 }
-function filt(ws){return onlyRv?ws.filter(w=>w.rv.length||w.aw.length):ws}
+function filt(ws){return onlyRv?ws.filter(w=>w.rv.length||w.aw.length||w.iv.length):ws}
 function yearBody(k,y){
   const all=works(k,y);
   let h='';
@@ -411,8 +412,8 @@ function yearBody(k,y){
       const adding=editing&&editing.t==='work'&&editing.isNew&&!editing.top&&editing.y==y&&editing.cour===c;
       if(!ws.length&&!adding) continue;
       const cid=`tv-c${y}${c}`;
-      const r=ws.reduce((s,w)=>s+w.rv.length,0), a=ws.reduce((s,w)=>s+w.aw.length,0);
-      h+=`<details class="cour" data-id="${cid}"${op(cid)||(adding?' open':'')}><summary>${c}<span class="months">${mo}</span>${cntHtml(k,ws.length,r,a)}</summary>`;
+      const r=ws.reduce((s,w)=>s+w.rv.length,0), a=ws.reduce((s,w)=>s+w.aw.length,0), iv=ws.reduce((s,w)=>s+w.iv.length,0);
+      h+=`<details class="cour" data-id="${cid}"${op(cid)||(adding?' open':'')}><summary>${c}<span class="months">${mo}</span>${cntHtml(k,ws.length,r,a,iv)}</summary>`;
       if(openSet.has(cid)||adding){
         h+=worksHtml(k,y,ws);
         h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" data-cour="${c}">${ic('plus')}${c}クールに台帳にない作品を追加</button>`;
@@ -450,14 +451,35 @@ function worksHtml(k,y,ws){
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.iv.length?`<span class="rc" title="インタビュー数">${ic('mic')}${w.iv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
   return h+'</ul>';
 }
+// 記事の日付：ネット記事は年月日、紙媒体は年
+const artKey=r=>r.date||(r.year?r.year+'-99':'9999');
+const fmtDate=r=>r.date?r.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1/$2/$3'):(r.year||'');
+const ART={rv:{name:'レビュー',icon:'doc',who:'著者名'},iv:{name:'インタビュー',icon:'mic',who:'話し手'}};
+function artSection(w,t){
+  const A=ART[t], list=w[t].slice().sort((a,b)=>artKey(a)<artKey(b)?-1:1);
+  if(t==='iv'&&!list.length&&!editMode) return '';
+  let h=`<h3>${ic(A.icon)}${A.name}</h3><ul>`;
+  if(!list.length) h+='<li class="empty">まだありません</li>';
+  for(const r of list){
+    if(editing&&editing.t===t&&editing.id===r.id){h+='<li>'+rvForm(editing)+'</li>';continue}
+    const ti=`「${esc(r.title)}」`;
+    const src=r.type==='web'
+      ? `<span class="src"><span class="ico">${ic('globe')}</span>${esc(r.media)}</span>`
+      : `<span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』${r.publisher?esc(r.publisher):''}</span>`;
+    const d=fmtDate(r);
+    h+=`<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic(t==='iv'?'mic':'person')}</span>${esc(r.author)}</span>`:''}<span class="ti">${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${ti}</a>`:ti}</span>${r.inter?` <span class="au"><span class="ico">${ic('person')}</span>聞き手：${esc(r.inter)}</span>`:''} ${src}${d?` <span class="y">${ic('cal')}${esc(d)}</span>`:''}</span><span class="ops"><button class="ib" data-act="editArt" data-t="${t}" title="${A.name}を編集">${ic('pen')}</button><button class="ib del" data-act="delArt" data-t="${t}" title="${A.name}を削除">${ic('trash')}</button></span></li>`;
+  }
+  h+='</ul>';
+  h+= editing&&editing.t===t&&editing.isNew&&editing.w===w.id ? rvForm(editing) : `<button class="add" data-act="addArt" data-t="${t}">${ic('plus')}${A.name}を追加</button>`;
+  return h;
+}
 function workBody(w,y){
-  const rv=w.rv.slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
   const aw=w.aw.slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
   let h='<div class="wbody">';
   const info=[];
@@ -467,18 +489,7 @@ function workBody(w,y){
   if(w.dir) info.push(`<span title="監督">${ic('mega')}${esc(w.dir)}</span>`);
   if(w.title!==w.orig) info.push(`<span title="台帳の題名">台帳：${esc(w.orig)}</span>`);
   h+=`<div class="info">${info.join('')}</div>`;
-  h+=`<h3>${ic('doc')}レビュー</h3><ul>`;
-  if(!rv.length) h+='<li class="empty">まだありません</li>';
-  for(const r of rv){
-    if(editing&&editing.t==='rv'&&editing.id===r.id){h+='<li>'+rvForm(editing)+'</li>';continue}
-    const ti=`「${esc(r.title)}」`;
-    const src=r.type==='web'
-      ? `<span class="src"><span class="ico">${ic('globe')}</span>${esc(r.media)}</span>`
-      : `<span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』${r.publisher?esc(r.publisher):''}</span>`;
-    h+=`<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic('person')}</span>${esc(r.author)}</span>`:''}<span class="ti">${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${ti}</a>`:ti}</span> ${src}${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}</span><span class="ops"><button class="ib" data-act="editRv" title="レビューを編集">${ic('pen')}</button><button class="ib del" data-act="delRv" title="レビューを削除">${ic('trash')}</button></span></li>`;
-  }
-  h+='</ul>';
-  h+= editing&&editing.t==='rv'&&editing.isNew&&editing.w===w.id ? rvForm(editing) : `<button class="add" data-act="addRv">${ic('plus')}レビューを追加</button>`;
+  h+=artSection(w,'rv')+artSection(w,'iv');
   if(aw.length||editMode){
     h+=`<h3>${ic('trophy')}受賞歴</h3><ul>`;
     if(!aw.length) h+='<li class="empty">まだありません</li>';
@@ -503,13 +514,15 @@ function workForm(e){
   ${btns}</form>`;
 }
 function rvForm(e){
-  const web=e.v&&e.v.type==='web';
-  return `<form class="f" data-form="rv"><label>${ic('person')}著者名<input type="text" name="author" value="${val(e,'author')}"></label>
+  const web=e.v&&e.v.type==='web', iv=e.t==='iv';
+  return `<form class="f" data-form="art"><label>${ic(iv?'mic':'person')}${iv?'話し手':'著者名'}<input type="text" name="author" value="${val(e,'author')}"${iv?' placeholder="インタビューを受けた人"':''}></label>
+  ${iv?`<label>${ic('person')}聞き手<input type="text" name="inter" placeholder="聞き手・構成（任意）" value="${val(e,'inter')}"></label>`:''}
   <label>タイトル<input type="text" name="title" required value="${val(e,'title')}"></label>
   <div class="seg"><label><input type="radio" name="type" value="paper"${web?'':' checked'}>${ic('book')}紙の媒体</label><label><input type="radio" name="type" value="web"${web?' checked':''}>${ic('globe')}ネット</label></div>
   <label><span data-lbl>${web?'メディア名':'媒体名'}</span><input type="text" name="media" required value="${val(e,'media')}"></label>
   <label data-paper${web?' hidden':''}>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
-  <label>${ic('cal')}発表年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  <label data-paper${web?' hidden':''}>${ic('cal')}発表年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  <label data-web${web?'':' hidden'}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
   <label>${ic('link')}URL<input type="url" name="url" placeholder="https://（任意）" value="${val(e,'url')}"></label>
   ${btns}</form>`;
 }
@@ -566,12 +579,12 @@ document.addEventListener('click',async ev=>{
       editing=null; markDirty(kind,c.y); render(); toast(`「${c.w.title}」を一覧から外しました`,true); break;
     }
     case 'unhide': {const u=ud(kind,b.dataset.y);u.hide=u.hide.filter(x=>x!==b.dataset.id);markDirty(kind,b.dataset.y);render();break}
-    case 'addRv': editing={t:'rv',isNew:true,w:c.id,y:c.y,v:{}}; openSet.add('w-'+c.id); render(); break;
-    case 'editRv': {const id=b.closest('[data-r]').dataset.r; editing={t:'rv',id,w:c.id,y:c.y,v:c.w.rv.find(r=>r.id===id)}; render(); break}
-    case 'delRv': {
-      const s=slot(kind,c.y,c.id), id=b.closest('[data-r]').dataset.r, i=s.rv.findIndex(r=>r.id===id), item=s.rv[i];
-      s.rv.splice(i,1); undoStack.push({k:kind,y:c.y,type:'rv',w:c.id,item,i});
-      markDirty(kind,c.y); render(); toast(`レビュー「${item.title}」を削除しました`,true); break;
+    case 'addArt': editing={t:b.dataset.t,isNew:true,w:c.id,y:c.y,v:{}}; openSet.add('w-'+c.id); render(); break;
+    case 'editArt': {const t=b.dataset.t,id=b.closest('[data-r]').dataset.r; editing={t,id,w:c.id,y:c.y,v:c.w[t].find(r=>r.id===id)}; render(); break}
+    case 'delArt': {
+      const t=b.dataset.t, s=slot(kind,c.y,c.id), id=b.closest('[data-r]').dataset.r, i=s[t].findIndex(r=>r.id===id), item=s[t][i];
+      s[t].splice(i,1); undoStack.push({k:kind,y:c.y,type:t,w:c.id,item,i});
+      markDirty(kind,c.y); render(); toast(`${ART[t].name}「${item.title}」を削除しました`,true); break;
     }
     case 'addAw': editing={t:'aw',isNew:true,w:c.id,y:c.y,v:{year:c.y}}; openSet.add('w-'+c.id); render(); break;
     case 'editAw': {const id=b.closest('[data-a]').dataset.a; editing={t:'aw',id,w:c.id,y:c.y,v:c.w.aw.find(a=>a.id===id)}; render(); break}
@@ -585,7 +598,7 @@ document.addEventListener('click',async ev=>{
       await ensureYear(u.k,u.y); const d=ud(u.k,u.y);
       if(u.type==='add') d.add.splice(u.i,0,u.item);
       else if(u.type==='hide') d.hide=d.hide.filter(x=>x!==u.id);
-      else{const s=slot(u.k,u.y,u.w);(u.type==='rv'?s.rv:s.aw).splice(u.i,0,u.item)}
+      else{const s=slot(u.k,u.y,u.w);s[u.type].splice(u.i,0,u.item)}
       markDirty(u.k,u.y); render();
       toast(undoStack.length?'元に戻しました（さらに戻せます）':'元に戻しました',undoStack.length>0);
       break;
@@ -596,7 +609,8 @@ document.addEventListener('change',ev=>{
   if(ev.target.name==='type'){
     const f=ev.target.form, web=ev.target.value==='web';
     f.querySelector('[data-lbl]').textContent=web?'メディア名':'媒体名';
-    f.querySelector('[data-paper]').hidden=web;
+    f.querySelectorAll('[data-paper]').forEach(x=>x.hidden=web);
+    f.querySelectorAll('[data-web]').forEach(x=>x.hidden=!web);
   }
 });
 document.addEventListener('submit',async ev=>{
@@ -634,11 +648,14 @@ document.addEventListener('submit',async ev=>{
     markDirty(kind,e.y);
   }else{
     const s=slot(kind,e.y,e.w);
-    if(f.dataset.form==='rv'){
-      const r={id:e.isNew?uid():e.id,author:fd.author,title:fd.title,type:fd.type,media:fd.media,year:fd.year?+fd.year:'',url:fd.url};
-      if(fd.type==='paper'&&fd.publisher) r.publisher=fd.publisher;
-      for(const k of ['author','year','url']) if(!r[k]) delete r[k];
-      if(e.isNew) s.rv.push(r); else s.rv[s.rv.findIndex(x=>x.id===e.id)]=r;
+    if(f.dataset.form==='art'){
+      const web=fd.type==='web';
+      const r={id:e.isNew?uid():e.id,author:fd.author,inter:fd.inter,title:fd.title,type:fd.type,media:fd.media,url:fd.url};
+      if(web){ if(fd.date){r.date=fd.date;r.year=+fd.date.slice(0,4)} }
+      else{ if(fd.publisher) r.publisher=fd.publisher; if(fd.year) r.year=+fd.year }
+      for(const k of ['author','inter','url']) if(!r[k]) delete r[k];
+      const L=s[e.t];
+      if(e.isNew) L.push(r); else L[L.findIndex(x=>x.id===e.id)]=r;
     }else{
       const a={id:e.isNew?uid():e.id,name:fd.name,prize:fd.prize,year:fd.year?+fd.year:''};
       if(!a.prize) delete a.prize; if(!a.year) delete a.year;
