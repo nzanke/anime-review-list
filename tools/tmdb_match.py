@@ -133,6 +133,10 @@ def main():
     json.dump(dict(sorted(posters.items())), open(P('catalog', 'posters.json'), 'w', encoding='utf-8'),
               ensure_ascii=False, separators=(',', ':'))
     json.dump(unsure, open(P('data', 'tmdb-unsure.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    # 閲覧ページ用の軽い一覧：{作品ID: 画像の名前（先頭の / と .jpg を外したもの）}
+    thumbs = {k: re.sub(r'^/|\.jpg$', '', v[1]) for k, v in posters.items()}
+    json.dump(dict(sorted(thumbs.items())), open(P('catalog', 'thumbs.json'), 'w', encoding='utf-8'),
+              ensure_ascii=False, separators=(',', ':'))
     print('ポスターあり', len(posters), '迷う', len(unsure), flush=True)
 
 

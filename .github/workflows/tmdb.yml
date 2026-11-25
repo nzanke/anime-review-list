@@ -22,6 +22,6 @@ jobs:
         run: |
           git config user.name nzanke
           git config user.email nzanke@users.noreply.github.com
-          git add catalog/posters.json data/tmdb-unsure.json
+          git add catalog/posters.json catalog/thumbs.json data/tmdb-unsure.json
           git diff --cached --quiet || git commit -m "TMDBのポスター照合の結果を保存"
           for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done

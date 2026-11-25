@@ -53,6 +53,10 @@ header h1 a{text-decoration:none}
 #results{list-style:none;margin:0 0 30px;padding:0}
 .row{display:flex;align-items:center;gap:7px;background:var(--card);border:1px solid var(--line);border-radius:8px;margin:5px 0;padding:8px 10px;text-decoration:none}
 .row:hover{border-color:var(--acc)}
+.th{flex:none;width:30px;height:45px;border-radius:4px;overflow:hidden;background:var(--acc-pale);color:var(--acc);display:inline-flex;align-items:center;justify-content:center;opacity:.9}
+.th img{width:100%;height:100%;object-fit:cover;display:block}
+.th svg{width:14px;height:14px;opacity:.6}
+.row{padding-top:5px!important;padding-bottom:5px!important}
 .len{flex:none;display:inline-flex;align-items:center;justify-content:center;width:1.55em;height:1.55em;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--movie);color:var(--movie);line-height:1}
 .len.l長{background:var(--movie);color:#fff}.len.l中{background:var(--movie-pale)}.len.none{border-color:transparent}
 .kd{flex:none;color:var(--movie)}.kd.tv{color:var(--tv)}
@@ -74,6 +78,10 @@ mark{background:hsl(50 90% 85%);color:inherit;border-radius:2px}
 .back{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--sub);text-decoration:none;margin-bottom:10px}
 .back:hover{color:var(--acc)}
 .wh{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;border-top:4px solid var(--acc)}
+.wh.hasp{display:grid;grid-template-columns:auto 1fr;column-gap:16px;align-items:start}
+.wh.hasp>*:not(.poster){grid-column:2}
+.wh .poster{grid-row:1/span 3;width:110px;border-radius:6px;box-shadow:0 1px 4px hsl(222 20% 40%/.25)}
+@media (max-width:480px){.wh .poster{width:84px}}
 .wh .kind{font-size:12px;color:var(--acc);display:inline-flex;align-items:center;gap:4px;font-weight:700}
 .wh h2{font-size:21px;margin:4px 0 10px;line-height:1.4}
 .facts{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:0;font-size:14px}
@@ -92,6 +100,8 @@ mark{background:hsl(50 90% 85%);color:inherit;border-radius:2px}
 .awi .ico{color:var(--gold)}.awi .prize{color:var(--gold);font-weight:700}
 .ndl{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:4px;padding:0 4px;white-space:nowrap}
 .none{color:var(--sub);font-size:14px;padding:10px 2px}
+footer#credit{font-size:11px;color:var(--sub);padding:18px 14px 30px;line-height:1.5;border-top:1px solid var(--line);margin-top:10px}
+.tmdb{display:inline-block;background:linear-gradient(90deg,#90cea1,#01b4e4);color:#0d253f;font-weight:700;border-radius:4px;padding:0 6px;margin-right:6px;text-decoration:none}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -151,6 +161,7 @@ mark{background:hsl(50 90% 85%);color:inherit;border-radius:2px}
   </section>
   <section id="work" hidden></section>
 </main>
+<footer class="wrap" id="credit"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener" class="tmdb">TMDB</a>ポスター画像は TMDB の API を使って表示しています。This product uses the TMDB API but is not endorsed or certified by TMDB.</footer>
 
 <script>
 'use strict';
@@ -163,7 +174,9 @@ const courOf=md=>{let m=parseInt(md,10),d=parseInt((md||'').split('-')[1],10)||0
 const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
 const kindOf=id=>id[0]==='f'?'movie':'tv';
 const OPT=Object.assign({fTitle:true,fDir:false,fStudio:false,movie:true,tv:true,onlyArt:false,soshu:true},LS.get('arv-opts',{}));
-let TITLES=null, STAFF=null, HAS={}, SOSHU={};
+let TITLES=null, STAFF=null, HAS={}, SOSHU={}, THUMBS=null;
+const IMG='https://image.tmdb.org/t/p/';
+const thumb=(id,size)=>THUMBS&&THUMBS[id]?`${IMG}${size}/${THUMBS[id]}${/\.\w+$/.test(THUMBS[id])?'':'.jpg'}`:'';
 const cache={};
 const getJSON=async(p,fresh)=>{if(cache[p]) return cache[p];const r=await fetch(p,{cache:fresh?'no-cache':'default'});if(r.status===404) return cache[p]=null;if(!r.ok) throw new Error(r.status);return cache[p]=await r.json()};
 
@@ -174,6 +187,7 @@ const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g
 let shown=0, hits=[];
 async function ensureIndex(){
   const ps=[];
+  if(!THUMBS) ps.push(getJSON('catalog/thumbs.json').then(d=>{THUMBS=d||{}}).catch(()=>{THUMBS={}}));
   if(!TITLES) ps.push(getJSON('catalog/search-titles.json').then(d=>{TITLES=d.map(r=>({id:r[0],title:r[1],date:r[2],min:r[3],n:norm(r[1])}))}));
   if((OPT.fDir||OPT.fStudio||matchMedia('(min-width:641px)').matches)&&!STAFF) ps.push(getJSON('catalog/search-staff.json').then(d=>{STAFF={};for(const r of d) STAFF[r[0]]={dir:r[1],studio:r[2],nd:norm(r[1]),ns:norm(r[2])}}));
   if(ps.length){$('#info').textContent='索引を読み込み中…';await Promise.all(ps)}
@@ -212,9 +226,10 @@ function rowHtml(w){
   const k=w.k||kindOf(w.id), y=String(w.date).slice(0,4), st=STAFF&&STAFF[w.id], h=HAS[w.id];
   const dirs=st?(st.dir||'').split('、').filter(Boolean):[], sts=st?(st.studio||'').split('、').filter(x=>x&&x!=='-'):[];
   const sub=(dirs.length||sts.length)?`<span class="sub">${dirs.length?`<span>${ic('mega')}${esc(dirs.length>2?dirs.slice(0,2).join('・')+' ほか':dirs.join('・'))}</span>`:''}${sts.length?`<span class="ss">${ic('studio')}${esc(sts[0])}${sts.length>1?' ほか':''}</span>`:''}</span>`:'';
-  const len=k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none"></span>'):`<span class="kd tv" title="テレビアニメ">${ic('tv')}</span>`;
+  const len=k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none"></span>'):'<span class="len none"></span>';
   const meta=h?`<span class="meta">${h[2]?`<span title="レビュー">${ic('doc')}${h[2]}</span>`:''}${h[3]?`<span title="資料">${ic('lib')}${h[3]}</span>`:''}${h[4]?`<span class="aw" title="受賞歴">${ic('trophy')}${h[4]}</span>`:''}</span>`:'';
-  return `<li><a class="row" href="#/${k}/${y}/${w.id}">${len}<span class="dt">${fmtD(w.date)}</span><span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${SOSHU[w.id]?'<span class="tag">総集編</span>':''}</span>${sub}</span>${meta}</a></li>`;
+  const th=thumb(w.id,'w92');
+  return `<li><a class="row" href="#/${k}/${y}/${w.id}"><span class="th">${th?`<img src="${th}" alt="" loading="lazy" decoding="async">`:ic(k==='tv'?'tv':'film')}</span>${len}<span class="dt">${fmtD(w.date)}</span><span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${SOSHU[w.id]?'<span class="tag">総集編</span>':''}</span>${sub}</span>${meta}</a></li>`;
 }
 function more(){
   const n=Math.min(hits.length,shown+100);
@@ -260,8 +275,10 @@ async function showWork(k,y,id){
   if(w.min) facts.push([ic('clock')+'上映時間',`${w.min}分（${lenCls(w.min)}）`]);
   if(w.dir) facts.push([ic('mega')+'監督',esc(w.dir)]);
   if(w.studio&&w.studio!=='-') facts.push([ic('studio')+'制作',esc(w.studio)]);
+  if(!THUMBS){try{THUMBS=await getJSON('catalog/thumbs.json')||{}}catch(e){THUMBS={}}}
+  const pt=thumb(id,'w185');
   let h=`<a class="back" href="#">${ic('undo')}検索に戻る</a>
-  <div class="wh"><span class="kind">${ic(k==='tv'?'tv':'film')}${k==='tv'?'テレビアニメ':'アニメ映画'}${SOSHU[id]?'<span class="tag">総集編</span>':''}</span><h2>${esc(w.title)}</h2>
+  <div class="wh${pt?' hasp':''}">${pt?`<img class="poster" src="${pt}" alt="">`:''}<span class="kind">${ic(k==='tv'?'tv':'film')}${k==='tv'?'テレビアニメ':'アニメ映画'}${SOSHU[id]?'<span class="tag">総集編</span>':''}</span><h2>${esc(w.title)}</h2>
   <dl class="facts">${facts.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>`;
   const sec=(icon,name,list,fn)=>list.length?`<div class="sec"><h3>${ic(icon)}${name}<span class="n">${list.length}件</span></h3><ul>${list.map(fn).join('')}</ul></div>`:'';
   h+=sec('doc','レビュー',rv,rvLine)+sec('lib','資料',sr,srLine)+sec('trophy','受賞歴',aw,a=>`<li class="it awi"><span class="ico">${ic('trophy')}</span>${esc(a.name)}${a.prize?` <span class="prize">${esc(a.prize)}</span>`:''}${a.year?` <span class="y">${ic('cal')}${esc(a.year)}</span>`:''}</li>`);
