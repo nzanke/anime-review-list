@@ -77,9 +77,10 @@ details[open]>summary::before{transform:rotate(45deg)}
 .work{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:5px 0}
 .work>summary{padding:7px 8px;gap:6px}
 .work>summary .t{flex:1;min-width:0}
-.work>summary .t{display:flex;flex-direction:column;gap:1px}
-.work>summary .tt{font-weight:700}
-.work>summary .sub{display:flex;gap:10px;font-size:12px;font-weight:400;color:var(--sub);min-width:0;white-space:nowrap;overflow:hidden}
+/* PCは作品名と同じ行に監督・スタジオ（入りきらない分は監督・スタジオの側から縮めて…で切る）。スマホでは出さない */
+.work>summary .t{display:flex;align-items:baseline;gap:14px}
+.work>summary .tt{font-weight:700;flex:0 1 auto;min-width:0}
+.work>summary .sub{flex:0 1000 auto;display:flex;gap:10px;font-size:12px;font-weight:400;color:var(--sub);min-width:0;white-space:nowrap;overflow:hidden}
 .work>summary .sub>span{display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .work>summary .sub .sd{flex:0 0 auto;max-width:65%}
 .work>summary .sub .ss{flex:0 1 auto;padding-left:10px;border-left:1px solid var(--line)}
@@ -145,6 +146,14 @@ dialog .btns{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
 dialog .btns button{border:1px solid var(--acc);border-radius:6px;padding:5px 14px;cursor:pointer;background:#fff;color:var(--acc)}
 dialog .btns button.p{background:var(--acc);color:#fff}
 [hidden]{display:none!important}
+@media (min-width:641px){
+  .wrap{max-width:980px}
+  .work>summary .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .work>summary .sub .sd{flex:0 1 auto;max-width:none}
+}
+@media (max-width:640px){
+  .work>summary .sub{display:none}
+}
 @media (max-width:480px){
   header h1{font-size:14px}
   header .wrap{gap:4px}
@@ -435,7 +444,7 @@ function worksHtml(k,y,ws){
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
