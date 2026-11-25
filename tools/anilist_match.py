@@ -155,6 +155,11 @@ def main():
         vars_def = ', '.join(f'$s{i}: String' for i in range(n))
         body = ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(n))
         return f'query ({vars_def}) {{ {body} }}'
+    if '--debug' in sys.argv:
+        for q, y in [('機動戦士ガンダムII', 1981), ('機動戦士ガンダム', 1981), ('魔法少女まどか☆マギカ', 2012), ('まどか', 2012), ('Gのレコンギスタ', 2019), ('進撃の巨人', 2024), ('Mobile Suit Gundam II', 1981)]:
+            d = gql('query { Page(perPage: 15) { media(search: ' + json.dumps(q, ensure_ascii=False) + f', type: ANIME, startDate_greater: {y-1}0000, startDate_lesser: {y+2}0000) {{ {FIELDS} }} }} }}', {})
+            print('調べ', q, y, [(m['title']['native'], m['format'], (m['startDate'] or {}).get('year')) for m in ((d.get('Page') or {}).get('media') or [])], flush=True)
+        return
     if '--test' in sys.argv:
         sample = [r for r in rows if r[0] in ('f0092', 'f0311', 'f1337', 'f2227', 'f0570', 'f1883')] + rows[3000:3010] + rows[7000:7004]
         for b in range(0, len(sample), BATCH):
