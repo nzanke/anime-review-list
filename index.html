@@ -101,7 +101,6 @@ mark{background:hsl(50 90% 85%);color:inherit;border-radius:2px}
 .ndl{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:4px;padding:0 4px;white-space:nowrap}
 .none{color:var(--sub);font-size:14px;padding:10px 2px}
 footer#credit{font-size:11px;color:var(--sub);padding:18px 14px 30px;line-height:1.5;border-top:1px solid var(--line);margin-top:10px}
-.tmdb{display:inline-block;background:linear-gradient(90deg,#90cea1,#01b4e4);color:#0d253f;font-weight:700;border-radius:4px;padding:0 6px;margin-right:6px;text-decoration:none}
 [hidden]{display:none!important}
 </style>
 </head>
@@ -161,7 +160,7 @@ footer#credit{font-size:11px;color:var(--sub);padding:18px 14px 30px;line-height
   </section>
   <section id="work" hidden></section>
 </main>
-<footer class="wrap" id="credit"><a href="https://www.themoviedb.org/" target="_blank" rel="noopener" class="tmdb">TMDB</a>ポスター画像は TMDB の API を使って表示しています。This product uses the TMDB API but is not endorsed or certified by TMDB.</footer>
+<footer class="wrap" id="credit">表紙画像は <a href="https://anilist.co/" target="_blank" rel="noopener">AniList</a> の API を使って表示しています。作品のデータは日本語版ウィキペディアをもとにしています。</footer>
 
 <script>
 'use strict';
@@ -175,8 +174,8 @@ const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
 const kindOf=id=>id[0]==='f'?'movie':'tv';
 const OPT=Object.assign({fTitle:true,fDir:false,fStudio:false,movie:true,tv:true,onlyArt:false,soshu:true},LS.get('arv-opts',{}));
 let TITLES=null, STAFF=null, HAS={}, SOSHU={}, THUMBS=null;
-const IMG='https://image.tmdb.org/t/p/';
-const thumb=(id,size)=>THUMBS&&THUMBS[id]?`${IMG}${size}/${THUMBS[id]}${/\.\w+$/.test(THUMBS[id])?'':'.jpg'}`:'';
+// 表紙画像は AniList のもの（大きさ：small／medium／large）
+const thumb=(id,size)=>THUMBS&&THUMBS[id]?`https://s4.anilist.co/file/anilistcdn/media/anime/cover/${size}/${THUMBS[id]}`:'';
 const cache={};
 const getJSON=async(p,fresh)=>{if(cache[p]) return cache[p];const r=await fetch(p,{cache:fresh?'no-cache':'default'});if(r.status===404) return cache[p]=null;if(!r.ok) throw new Error(r.status);return cache[p]=await r.json()};
 
@@ -228,7 +227,7 @@ function rowHtml(w){
   const sub=(dirs.length||sts.length)?`<span class="sub">${dirs.length?`<span>${ic('mega')}${esc(dirs.length>2?dirs.slice(0,2).join('・')+' ほか':dirs.join('・'))}</span>`:''}${sts.length?`<span class="ss">${ic('studio')}${esc(sts[0])}${sts.length>1?' ほか':''}</span>`:''}</span>`:'';
   const len=k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none"></span>'):'<span class="len none"></span>';
   const meta=h?`<span class="meta">${h[2]?`<span title="レビュー">${ic('doc')}${h[2]}</span>`:''}${h[3]?`<span title="資料">${ic('lib')}${h[3]}</span>`:''}${h[4]?`<span class="aw" title="受賞歴">${ic('trophy')}${h[4]}</span>`:''}</span>`:'';
-  const th=thumb(w.id,'w92');
+  const th=thumb(w.id,'small');
   return `<li><a class="row" href="#/${k}/${y}/${w.id}"><span class="th">${th?`<img src="${th}" alt="" loading="lazy" decoding="async">`:ic(k==='tv'?'tv':'film')}</span>${len}<span class="dt">${fmtD(w.date)}</span><span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${SOSHU[w.id]?'<span class="tag">総集編</span>':''}</span>${sub}</span>${meta}</a></li>`;
 }
 function more(){
@@ -276,7 +275,7 @@ async function showWork(k,y,id){
   if(w.dir) facts.push([ic('mega')+'監督',esc(w.dir)]);
   if(w.studio&&w.studio!=='-') facts.push([ic('studio')+'制作',esc(w.studio)]);
   if(!THUMBS){try{THUMBS=await getJSON('catalog/thumbs.json')||{}}catch(e){THUMBS={}}}
-  const pt=thumb(id,'w185');
+  const pt=thumb(id,'medium');
   let h=`<a class="back" href="#">${ic('undo')}検索に戻る</a>
   <div class="wh${pt?' hasp':''}">${pt?`<img class="poster" src="${pt}" alt="">`:''}<span class="kind">${ic(k==='tv'?'tv':'film')}${k==='tv'?'テレビアニメ':'アニメ映画'}${SOSHU[id]?'<span class="tag">総集編</span>':''}</span><h2>${esc(w.title)}</h2>
   <dl class="facts">${facts.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>`;
