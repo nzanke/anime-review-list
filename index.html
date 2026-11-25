@@ -80,8 +80,10 @@ details[open]>summary::before{transform:rotate(45deg)}
 .work[open]>summary{border-bottom:1px solid var(--line)}
 .meta{display:inline-flex;gap:8px;font-size:12px;color:var(--sub);white-space:nowrap}
 .meta .aw{color:var(--gold)}
+.meta .len{color:var(--sub);display:inline-flex;align-items:center;gap:3px}
+.meta .len .mn{font-size:11px}
 .meta .rc{color:var(--acc);font-weight:700}
-.work>summary .dt{color:var(--sub);font-size:13px;min-width:3.2em;flex:none}
+.work>summary .dt{color:var(--sub);font-size:13px;min-width:2.7em;flex:none}
 .info{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--sub);padding:2px 0 4px}
 .info span{display:inline-flex;align-items:center;gap:3px}
 .tag{font-size:11px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;padding:0 4px;margin-left:4px;font-weight:400}
@@ -160,6 +162,7 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 <symbol id="i-studio" viewBox="0 0 24 24"><path d="M4 21V9l5 3V9l5 3V5h6v16z"/><path d="M8 17h2M14 17h2"/></symbol>
 <symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
 </svg>
 
@@ -255,11 +258,11 @@ function slot(k,y,id){const u=ud(k,y);return u.w[id]=u.w[id]||{rv:[],aw:[]}}
 function works(k,y){
   const key=k+'/'+y, u=UD[key]; if(!u||!CAT[key]) return [];
   const hide=new Set(u.hide), list=[];
-  const mk=(id,title,md,studio,dir,added,cour)=>{
+  const mk=(id,title,md,studio,dir,added,cour,min)=>{
     const f=u.fix[id]||{}, s=u.w[id]||{};
-    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title};
+    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title,min:min||0};
   };
-  for(const [id,t,md,st,dr] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false));
+  for(const [id,t,md,st,dr,mn] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false,null,mn));
   for(const a of u.add) list.push(mk(a.id,a.title,a.md||'','','',true,a.cour));
   return list;
 }
@@ -405,13 +408,15 @@ function yearBody(k,y){
   }
   return h;
 }
+// 上映時間の区分：30分未満＝短編、60分未満＝中編、それ以上＝長編
+const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
 const fmtMd=md=>md?md.replace(/^0?(\d+)(?:-0?(\d+))?$/,(_,m,d)=>d?`${m}/${d}`:`${m}月`):'';
 function worksHtml(k,y,ws){
   let h='<ul class="works">';
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.min?`<span class="len" title="上映時間${w.min}分">${lenCls(w.min)}<span class="mn">${w.min}分</span></span>`:''}${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
@@ -423,6 +428,7 @@ function workBody(w,y){
   let h='<div class="wbody">';
   const info=[];
   info.push(`<span title="${kind==='tv'?'放送開始':'公開日'}">${ic('cal')}${y}${w.md?'/'+fmtMd(w.md).replace('月',''):''}</span>`);
+  if(w.min) info.push(`<span title="上映時間">${ic('clock')}${w.min}分（${lenCls(w.min)}）</span>`);
   if(w.studio) info.push(`<span title="制作">${ic('studio')}${esc(w.studio)}</span>`);
   if(w.dir) info.push(`<span title="監督">${ic('mega')}${esc(w.dir)}</span>`);
   if(w.title!==w.orig) info.push(`<span title="台帳の題名">台帳：${esc(w.orig)}</span>`);
