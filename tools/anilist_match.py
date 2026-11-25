@@ -33,6 +33,7 @@ def save(path, data, compact=False):
 
 
 last = [0.0]
+stat = {'req': 0, 'r429': 0, 'wait': 0.0}
 fails = [0]   # 続けて拒否された回数。最初から拒否が続くときは早めに止める
 def gql(query, variables):
     for i in range(8):
@@ -45,11 +46,17 @@ def gql(query, variables):
                                               'User-Agent': 'anime-review-list/1.0 (+https://nzanke.github.io/anime-review-list/)'})
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
+                stat['req'] += 1
+                if stat['req'] <= 3 or stat['req'] % 20 == 0:
+                    print('応答', stat['req'], '回目 残り', r.headers.get('X-RateLimit-Remaining'), '/', r.headers.get('X-RateLimit-Limit'), flush=True)
                 fails[0] = 0
                 return json.load(r).get('data') or {}
         except urllib.error.HTTPError as e:
             if e.code == 429:
-                time.sleep(int(e.headers.get('Retry-After') or 60) + 1); continue
+                w = int(e.headers.get('Retry-After') or 60) + 1
+                stat['r429'] += 1; stat['wait'] += w
+                print('回数制限で待つ', w, '秒', flush=True)
+                time.sleep(w); continue
             if e.code >= 500:
                 time.sleep(10 * (i + 1)); continue
             body = e.read().decode('utf-8', 'replace')[:300]
@@ -162,6 +169,12 @@ def main():
         for q, y in [('機動戦士ガンダムII', 1981), ('機動戦士ガンダム', 1981), ('魔法少女まどか☆マギカ', 2012), ('まどか', 2012), ('Gのレコンギスタ', 2019), ('進撃の巨人', 2024), ('Mobile Suit Gundam II', 1981)]:
             d = gql('query { Page(perPage: 15) { media(search: ' + json.dumps(q, ensure_ascii=False) + f', type: ANIME, startDate_greater: {y-1}0000, startDate_lesser: {y+2}0000) {{ {FIELDS} }} }} }}', {})
             print('調べ', q, y, [(m['title']['native'], m['format'], (m['startDate'] or {}).get('year')) for m in ((d.get('Page') or {}).get('media') or [])], flush=True)
+        return
+    if '--timing' in sys.argv:
+        t0 = time.time()
+        for b in range(0, 150, BATCH):
+            lookup(rows[b:b + BATCH], make_query)
+        print('計測 150作品', round(time.time() - t0), '秒 問い合わせ', stat, flush=True)
         return
     if '--test' in sys.argv:
         sample = [r for r in rows if r[0] in ('f0092', 'f0311', 'f1337', 'f2227', 'f0570', 'f1883')] + rows[3000:3010] + rows[7000:7004]
