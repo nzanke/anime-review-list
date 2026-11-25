@@ -81,7 +81,7 @@ details[open]>summary::before{transform:rotate(45deg)}
 .meta{display:inline-flex;gap:8px;font-size:12px;color:var(--sub);white-space:nowrap}
 .meta .aw{color:var(--gold)}
 .meta .rc{color:var(--acc);font-weight:700}
-.meta .dt{color:var(--sub)}
+.work>summary .dt{color:var(--sub);font-size:13px;min-width:3.2em;flex:none}
 .info{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--sub);padding:2px 0 4px}
 .info span{display:inline-flex;align-items:center;gap:3px}
 .tag{font-size:11px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;padding:0 4px;margin-left:4px;font-weight:400}
@@ -411,7 +411,7 @@ function worksHtml(k,y,ws){
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary><span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:''}${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
