@@ -108,16 +108,18 @@ def main():
     rows = json.load(open(P('catalog', 'search-titles.json'), encoding='utf-8'))
     decisions = load(P('data', 'anilist-decisions.json'), {})
     only_new = '--only-new' in sys.argv
-    thumbs = load(P('catalog', 'thumbs.json'), {}) if only_new else {}
-    match = load(P('data', 'anilist-match.json'), {}) if only_new else {}
-    todo = [r for r in rows if r[0] not in decisions and r[0] not in match]
+    apply_only = '--apply' in sys.argv   # 依頼者の判断を当てはめるだけ（照合はしない）
+    keep = only_new or apply_only
+    thumbs = load(P('catalog', 'thumbs.json'), {}) if keep else {}
+    match = load(P('data', 'anilist-match.json'), {}) if keep else {}
+    todo = [] if apply_only else [r for r in rows if r[0] not in decisions and r[0] not in match]
     print('照合する作品', len(todo), '件（依頼者の判断済み', len(decisions), '件）', flush=True)
 
     def make_query(n):
         vars_def = ', '.join(f'$s{i}: String' for i in range(n))
         body = ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(n))
         return f'query ({vars_def}) {{ {body} }}'
-    unsure = []
+    unsure = [u for u in load(P('data', 'anilist-unsure.json'), []) if u['id'] not in decisions] if apply_only else []
     for b in range(0, len(todo), BATCH):
         chunk = todo[b:b + BATCH]
         data = gql(make_query(len(chunk)), {f's{i}': core(r[1]) for i, r in enumerate(chunk)})

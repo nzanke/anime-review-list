@@ -1,11 +1,17 @@
 name: AniListの表紙画像を照合
 on:
+  push:
+    branches: [main]
+    paths: ['data/anilist-decisions.json']
   workflow_dispatch:
     inputs:
       args:
         description: 'anilist_match.py に渡す引数（--only-new で未照合の作品だけ）'
         required: false
         default: ''
+concurrency:
+  group: anilist
+  cancel-in-progress: false
 permissions:
   contents: write
 jobs:
@@ -15,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 照合する
-        run: python3 tools/anilist_match.py ${{ github.event.inputs.args }}
+        run: python3 tools/anilist_match.py ${{ github.event_name == 'push' && '--apply' || github.event.inputs.args }}
       - name: 結果を保存する
         if: always()
         run: |
