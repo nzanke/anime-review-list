@@ -901,5 +901,544 @@
     "cover": "bx100780-0umTIigEolK8.jpg"
    }
   ]
+ },
+ {
+  "id": "f1827",
+  "title": "鬼滅の刃 兄妹の絆",
+  "date": "2019-03-29",
+  "cands": [
+   {
+    "aid": 101922,
+    "title": "鬼滅の刃",
+    "format": "TV",
+    "year": 2019,
+    "cover": "bx101922-WBsBl0ClmgYL.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1797",
+  "title": "続・終物語",
+  "date": "2018-11-10",
+  "cands": [
+   {
+    "aid": 100815,
+    "title": "続・終物語",
+    "format": "OVA",
+    "year": 2019,
+    "cover": "bx100815-cZbnM9Bjth8W.png"
+   }
+  ]
+ },
+ {
+  "id": "f1792",
+  "title": "映画 HUGっと!プリキュア♡ふたりはプリキュア オールスターズメモリーズ",
+  "date": "2018-10-27",
+  "cands": [
+   {
+    "aid": 100661,
+    "title": "HUGっと！プリキュア",
+    "format": "TV",
+    "year": 2018,
+    "cover": "bx100661-XT2NWXKklV5T.png"
+   }
+  ]
+ },
+ {
+  "id": "f1782",
+  "title": "劇場版 フリクリ プログレ",
+  "date": "2018-09-28",
+  "cands": [
+   {
+    "aid": 21746,
+    "title": "フリクリ プログレ",
+    "format": "TV",
+    "year": 2018,
+    "cover": "bx21746-wBdtrYaF4ZIr.png"
+   }
+  ]
+ },
+ {
+  "id": "f1781",
+  "title": "若おかみは小学生!",
+  "date": "2018-09-21",
+  "cands": [
+   {
+    "aid": 101277,
+    "title": "若おかみは小学生！",
+    "format": "TV_SHORT",
+    "year": 2018,
+    "cover": "nx101277-xpHIcJx3zL3E.jpg"
+   },
+   {
+    "aid": 101478,
+    "title": "若おかみは小学生！(劇場版)",
+    "format": "MOVIE",
+    "year": 2018,
+    "cover": "bx101478-bo3xR8x2pc3i.png"
+   }
+  ]
+ },
+ {
+  "id": "f1780",
+  "title": "劇場版 フリクリ オルタナ",
+  "date": "2018-09-07",
+  "cands": [
+   {
+    "aid": 21748,
+    "title": "フリクリ オルタナ",
+    "format": "TV",
+    "year": 2018,
+    "cover": "bx21748-ZOusM9wb6Pln.png"
+   }
+  ]
+ },
+ {
+  "id": "f1719",
+  "title": "機動戦士ガンダム サンダーボルト BANDIT FLOWER",
+  "date": "2017-11-18",
+  "cands": [
+   {
+    "aid": 99547,
+    "title": "特別編 機動戦士ガンダムサンダーボルト BANDIT FLOWER",
+    "format": "MOVIE",
+    "year": 2017,
+    "cover": "bx99547-CrjeWJXe8zIA.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1694",
+  "title": "魔法使いの嫁 星待つひと 後篇",
+  "date": "2017-08-19",
+  "cands": [
+   {
+    "aid": 98436,
+    "title": "魔法使いの嫁",
+    "format": "TV",
+    "year": 2017,
+    "cover": "bx98436-n7sK6POCd0XV.png"
+   }
+  ]
+ },
+ {
+  "id": "f1647",
+  "title": "魔法使いの嫁 星待つひと 中篇",
+  "date": "2017-02-04",
+  "cands": [
+   {
+    "aid": 98436,
+    "title": "魔法使いの嫁",
+    "format": "TV",
+    "year": 2017,
+    "cover": "bx98436-n7sK6POCd0XV.png"
+   }
+  ]
+ },
+ {
+  "id": "f1646",
+  "title": "こんぷれっくす×コンプレックス",
+  "date": "2017-02-04",
+  "cands": [
+   {
+    "aid": 113136,
+    "title": "こんぷれっくす×コンプレックス",
+    "format": "MOVIE",
+    "year": 2015,
+    "cover": "b113136-rWhcnTc2QyXk.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1633",
+  "title": "CYBORG009 CALL OF JUSTICE 第3章",
+  "date": "2016-12-09",
+  "cands": [
+   {
+    "aid": 87483,
+    "title": "CYBORG009 CALL OF JUSTICE 3",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87483-GIAGPPUYCG0U.jpg"
+   },
+   {
+    "aid": 87481,
+    "title": "CYBORG009 CALL OF JUSTICE 1",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87481-YvwsTEs20ZaO.jpg"
+   },
+   {
+    "aid": 87482,
+    "title": "CYBORG009 CALL OF JUSTICE 2",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87482-tyYz2J8C9KYc.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1630",
+  "title": "CYBORG009 CALL OF JUSTICE 第2章",
+  "date": "2016-12-02",
+  "cands": [
+   {
+    "aid": 87483,
+    "title": "CYBORG009 CALL OF JUSTICE 3",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87483-GIAGPPUYCG0U.jpg"
+   },
+   {
+    "aid": 87481,
+    "title": "CYBORG009 CALL OF JUSTICE 1",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87481-YvwsTEs20ZaO.jpg"
+   },
+   {
+    "aid": 87482,
+    "title": "CYBORG009 CALL OF JUSTICE 2",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87482-tyYz2J8C9KYc.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1628",
+  "title": "CYBORG009 CALL OF JUSTICE 第1章",
+  "date": "2016-11-25",
+  "cands": [
+   {
+    "aid": 87483,
+    "title": "CYBORG009 CALL OF JUSTICE 3",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87483-GIAGPPUYCG0U.jpg"
+   },
+   {
+    "aid": 87481,
+    "title": "CYBORG009 CALL OF JUSTICE 1",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87481-YvwsTEs20ZaO.jpg"
+   },
+   {
+    "aid": 87482,
+    "title": "CYBORG009 CALL OF JUSTICE 2",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "87482-tyYz2J8C9KYc.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1606",
+  "title": "傷物語 II 熱血編",
+  "date": "2016-08-19",
+  "cands": [
+   {
+    "aid": 21399,
+    "title": "傷物語〈Ⅱ熱血篇〉",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "bx21399-VTAdAqc8u5AE.png"
+   }
+  ]
+ },
+ {
+  "id": "f1601",
+  "title": "ねむれ思い子 空のしとねに",
+  "date": "2016-08-06",
+  "cands": [
+   {
+    "aid": 21885,
+    "title": "ねむれ思い子 空のしとねに",
+    "format": "MOVIE",
+    "year": 2014,
+    "cover": "21885-LoVhf08LlmGk.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1591",
+  "title": "シンドバッド",
+  "date": "2016-05-14",
+  "cands": [
+   {
+    "aid": 100658,
+    "title": "シンドバッド 真昼の夜とふしぎの門",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "b100658-x8wUnwFk3ivs.png"
+   },
+   {
+    "aid": 21368,
+    "title": "シンドバッド 魔法のランプと動く島",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "21368-RY90qsP1PdAv.jpg"
+   },
+   {
+    "aid": 21394,
+    "title": "マギ シンドバッドの冒険",
+    "format": "TV",
+    "year": 2016,
+    "cover": "bx21394-yauvzIHGAoZv.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1578",
+  "title": "甲鉄城のカバネリ 序章",
+  "date": "2016-03-18",
+  "cands": [
+   {
+    "aid": 21196,
+    "title": "甲鉄城のカバネリ",
+    "format": "TV",
+    "year": 2016,
+    "cover": "bx21196-2PfPfIDrxKki.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1569",
+  "title": "コードギアス 亡国のアキト 最終章 愛シキモノタチへ",
+  "date": "2016-02-06",
+  "cands": [
+   {
+    "aid": 21178,
+    "title": "コードギアス 亡国のアキト 最終章 愛シキモノタチヘ",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "bx21178-jmxNhcsEELFt.png"
+   },
+   {
+    "aid": 109005,
+    "title": "コードギアス 亡国のアキト 最終章 愛シキモノタチヘ",
+    "format": "SPECIAL",
+    "year": 2016,
+    "cover": "bx109005-48XkpOiM5TS0.png"
+   }
+  ]
+ },
+ {
+  "id": "f1563",
+  "title": "傷物語 I 鉄血編",
+  "date": "2016-01-08",
+  "cands": [
+   {
+    "aid": 9260,
+    "title": "傷物語〈Ⅰ鉄血篇〉",
+    "format": "MOVIE",
+    "year": 2016,
+    "cover": "bx9260-cl7sczYOpTeW.png"
+   }
+  ]
+ },
+ {
+  "id": "f1552",
+  "title": "ミニはま MINIMUM-HAMATORA",
+  "date": "2015-11-14",
+  "cands": [
+   {
+    "aid": 21446,
+    "title": "ミニはま",
+    "format": "TV_SHORT",
+    "year": 2015,
+    "cover": "21446-K28zAwB9vrKw.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1549",
+  "title": "機動戦士ガンダム THE ORIGIN II 哀しみのアルテイシア",
+  "date": "2015-10-31",
+  "cands": [
+   {
+    "aid": 10937,
+    "title": "機動戦士ガンダムTHE ORIGIN",
+    "format": "OVA",
+    "year": 2015,
+    "cover": "bx10937-yNrI4MUsigat.png"
+   }
+  ]
+ },
+ {
+  "id": "f1548",
+  "title": "映画 Go!プリンセスプリキュア プリキュアとレフィのワンダーナイト!",
+  "date": "2015-10-31",
+  "cands": [
+   {
+    "aid": 21001,
+    "title": "Go!プリンセスプリキュア",
+    "format": "TV",
+    "year": 2015,
+    "cover": "bx21001-49nYJTr7Wnsu.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1547",
+  "title": "映画 Go!プリンセスプリキュア パンプキン王国のたからもの",
+  "date": "2015-10-31",
+  "cands": [
+   {
+    "aid": 21001,
+    "title": "Go!プリンセスプリキュア",
+    "format": "TV",
+    "year": 2015,
+    "cover": "bx21001-49nYJTr7Wnsu.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1546",
+  "title": "映画 Go!プリンセスプリキュア キュアフローラといたずらかがみ",
+  "date": "2015-10-31",
+  "cands": [
+   {
+    "aid": 21001,
+    "title": "Go!プリンセスプリキュア",
+    "format": "TV",
+    "year": 2015,
+    "cover": "bx21001-49nYJTr7Wnsu.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1523",
+  "title": "コードギアス 亡国のアキト 第4章 憎しみの記憶から",
+  "date": "2015-07-04",
+  "cands": [
+   {
+    "aid": 109004,
+    "title": "コードギアス 亡国のアキト 第4章 憎しみの記憶から",
+    "format": "SPECIAL",
+    "year": 2015,
+    "cover": "b109004-NGx9qAjTVboI.jpg"
+   },
+   {
+    "aid": 15201,
+    "title": "コードギアス 亡国のアキト 第4章 憎しみの記憶から",
+    "format": "MOVIE",
+    "year": 2015,
+    "cover": "bx15201-JqRtOF8UH3P5.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1490",
+  "title": "機動戦士ガンダム THE ORIGIN I 青い瞳のキャスバル",
+  "date": "2015-02-28",
+  "cands": [
+   {
+    "aid": 10937,
+    "title": "機動戦士ガンダムTHE ORIGIN",
+    "format": "OVA",
+    "year": 2015,
+    "cover": "bx10937-yNrI4MUsigat.png"
+   }
+  ]
+ },
+ {
+  "id": "f1480",
+  "title": "ゆるゆり なちゅやちゅみ",
+  "date": "2014-11-29",
+  "cands": [
+   {
+    "aid": 20625,
+    "title": "ゆるゆり　なちゅやちゅみ！",
+    "format": "OVA",
+    "year": 2015,
+    "cover": "bx20625-dm9pmEqlyY5T.png"
+   }
+  ]
+ },
+ {
+  "id": "f1463",
+  "title": "ガンダム Gのレコンギスタ",
+  "date": "2014-08-23",
+  "cands": [
+   {
+    "aid": 20658,
+    "title": "ガンダム Gのレコンギスタ",
+    "format": "TV",
+    "year": 2014,
+    "cover": "bx20658-P5QBsXm2dslC.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1394",
+  "title": "Fate ゼロカフェ 〜Fate/Zero Cafeに集う英霊達〜",
+  "date": "2013-07-13",
+  "cands": [
+   {
+    "aid": 19165,
+    "title": "Fate/ゼロカフェ",
+    "format": "MOVIE",
+    "year": 2013,
+    "cover": "19165.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1390",
+  "title": "攻殻機動隊ARISE border:1 Ghost Pain",
+  "date": "2013-06-22",
+  "cands": [
+   {
+    "aid": 20776,
+    "title": "攻殻機動隊ARISE",
+    "format": "SPECIAL",
+    "year": 2013,
+    "cover": "20776.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1347",
+  "title": "あらしのよるに 〜ひみつのともだち〜 シアターセレクション 出会い編",
+  "date": "2012-11-10",
+  "cands": [
+   {
+    "aid": 13029,
+    "title": "あらしのよるに ひみつのともだち",
+    "format": "TV",
+    "year": 2012,
+    "cover": "13029.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1339",
+  "title": "劇場版 魔法少女まどか☆マギカ [後編] 永遠の物語",
+  "date": "2012-10-13",
+  "cands": [
+   {
+    "aid": 11979,
+    "title": "劇場版 魔法少女まどか☆マギカ 永遠の物語",
+    "format": "MOVIE",
+    "year": 2012,
+    "cover": "bx11979-oiKvt5UXyREg.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f1337",
+  "title": "劇場版 魔法少女まどか☆マギカ [前編] 始まりの物語",
+  "date": "2012-10-06",
+  "cands": [
+   {
+    "aid": 11977,
+    "title": "劇場版 魔法少女まどか☆マギカ 始まりの物語",
+    "format": "MOVIE",
+    "year": 2012,
+    "cover": "bx11977-HxMeU4kjzSnE.png"
+   }
+  ]
  }
 ]
