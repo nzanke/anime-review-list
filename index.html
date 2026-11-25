@@ -76,7 +76,16 @@ details[open]>summary::before{transform:rotate(45deg)}
 .works{margin:0 0 8px 14px;padding:0;list-style:none}
 .work{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:5px 0}
 .work>summary{padding:7px 8px;gap:6px}
-.work>summary .t{font-weight:700;flex:1;min-width:0}
+.work>summary .t{flex:1;min-width:0}
+.work>summary .t{display:flex;flex-direction:column;gap:1px}
+.work>summary .tt{font-weight:700}
+.work>summary .sub{display:flex;gap:10px;font-size:12px;font-weight:400;color:var(--sub);min-width:0;white-space:nowrap;overflow:hidden}
+.work>summary .sub>span{display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.work>summary .sub .sd{flex:0 0 auto;max-width:65%}
+.work>summary .sub .ss{flex:0 1 auto;padding-left:10px;border-left:1px solid var(--line)}
+.work>summary .sub .sd:only-child,.work>summary .sub .ss:first-child{padding-left:0;border-left:0}
+.work>summary .sub svg.i{opacity:.7}
+
 .work[open]>summary{border-bottom:1px solid var(--line)}
 .meta{display:inline-flex;gap:8px;font-size:12px;color:var(--sub);white-space:nowrap}
 .meta .aw{color:var(--gold)}
@@ -413,13 +422,20 @@ function yearBody(k,y){
 }
 // 上映時間の区分：30分未満＝短編、60分未満＝中編、それ以上＝長編
 const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
+// 作品名の下に添える監督・スタジオ（監督が3人以上なら「ほか」でまとめる）
+function subLine(w){
+  const ds=(w.dir||'').split('、').filter(Boolean), st=(w.studio||'').split('、').filter(x=>x&&x!=='-');
+  if(!ds.length&&!st.length) return '';
+  const d=ds.length>2?ds.slice(0,2).join('・')+' ほか':ds.join('・');
+  return `<span class="sub">${d?`<span class="sd">${ic('mega')}${esc(d)}</span>`:''}${st.length?`<span class="ss">${ic('studio')}${esc(st[0])}${st.length>1?' ほか':''}</span>`:''}</span>`;
+}
 const fmtMd=md=>md?md.replace(/^0?(\d+)(?:-0?(\d+))?$/,(_,m,d)=>d?`${m}/${d}`:`${m}月`):'';
 function worksHtml(k,y,ws){
   let h='<ul class="works">';
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
