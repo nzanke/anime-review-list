@@ -76,6 +76,14 @@ def core(title):
     return t.strip() or title
 
 
+def short(title):
+    """2回目の検索用：かっこ・記号を外し、空白や「〜」より前の部分だけにする"""
+    t = core(title)
+    t = re.sub(r'[「」『』【】\[\]〔〕]', ' ', t)
+    t = re.split(r'\s|〜|～|~|－|-|―|:|：|／|/', t.strip())[0]
+    return t[:12] if len(t) > 12 else t
+
+
 MOVIE_FMT = {'MOVIE', 'SPECIAL', 'OVA'}
 TV_FMT = {'TV', 'TV_SHORT', 'ONA', 'SPECIAL'}
 
@@ -97,8 +105,9 @@ def judge(kind, title, year, cands):
     if not scored:
         return 'none', None, []
     top = scored[0]
-    if top[1] and top[2] and top[3] and (len(scored) == 1 or scored[1][0] < top[0]):
-        return 'sure', top[4], []
+    if top[2] and top[3] and top[0] >= 6 and (len(scored) == 1 or scored[1][0] < top[0]):
+        if top[1] or sum(1 for x in scored if x[2] and x[3]) == 1:
+            return 'sure', top[4], []
     good = [x[4] for x in scored if x[0] >= 5][:4]
     return ('unsure', None, good) if good else ('none', None, [])
 
@@ -110,6 +119,24 @@ def cover_name(c):
     return url.rsplit('/', 1)[-1]
 
 
+def lookup(chunk, make_query):
+    """10作品ずつ調べる。見つからなかった作品は短い題名でもう一度まとめて調べる"""
+    data = gql(make_query(len(chunk)), {f's{i}': core(r[1]) for i, r in enumerate(chunk)})
+    out = []
+    for i, r in enumerate(chunk):
+        kind = 'movie' if r[0].startswith('f') else 'tv'
+        cands = ((data.get(f'a{i}') or {}).get('media')) or []
+        out.append(judge(kind, r[1], r[2][:4], cands))
+    retry = [i for i, (res, b, g) in enumerate(out) if res == 'none' and short(chunk[i][1]) != core(chunk[i][1]) and len(short(chunk[i][1])) >= 2]
+    if retry:
+        d2 = gql(make_query(len(retry)), {f's{j}': short(chunk[i][1]) for j, i in enumerate(retry)})
+        for j, i in enumerate(retry):
+            r = chunk[i]
+            cands = ((d2.get(f'a{j}') or {}).get('media')) or []
+            out[i] = judge('movie' if r[0].startswith('f') else 'tv', r[1], r[2][:4], cands)
+    return out
+
+
 def main():
     rows = json.load(open(P('catalog', 'search-titles.json'), encoding='utf-8'))
     decisions = load(P('data', 'anilist-decisions.json'), {})
@@ -119,30 +146,26 @@ def main():
     thumbs = load(P('catalog', 'thumbs.json'), {}) if keep else {}
     match = load(P('data', 'anilist-match.json'), {}) if keep else {}
     todo = [] if apply_only else [r for r in rows if r[0] not in decisions and r[0] not in match]
-    if '--test' in sys.argv:
-        sample = [r for r in rows if r[0] in ('f0092', 'f0311', 'f1337', 'f2227')] + rows[3000:3006]
-        q = 'query (' + ', '.join(f'$s{i}: String' for i in range(len(sample))) + ') { ' + ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(len(sample))) + ' }'
-        data = gql(q, {f's{i}': core(r[1]) for i, r in enumerate(sample)})
-        for i, r in enumerate(sample):
-            cands = ((data.get(f'a{i}') or {}).get('media')) or []
-            res, best, good = judge('movie' if r[0].startswith('f') else 'tv', r[1], r[2][:4], cands)
-            print('試し', r[0], r[1], r[2], '→', res, (best or {}).get('title'), cover_name(best), len(cands), '候補', flush=True)
-        return
-    print('照合する作品', len(todo), '件（依頼者の判断済み', len(decisions), '件）', flush=True)
-
     def make_query(n):
         vars_def = ', '.join(f'$s{i}: String' for i in range(n))
         body = ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(n))
         return f'query ({vars_def}) {{ {body} }}'
+    if '--test' in sys.argv:
+        sample = [r for r in rows if r[0] in ('f0092', 'f0311', 'f1337', 'f2227', 'f0570', 'f1883')] + rows[3000:3010] + rows[7000:7004]
+        for b in range(0, len(sample), BATCH):
+            chunk = sample[b:b + BATCH]
+            for r, (res, best, good) in zip(chunk, lookup(chunk, make_query)):
+                print('試し', r[0], r[1], r[2], '→', res, ((best or {}).get('title') or {}).get('native'), cover_name(best), [g['title']['native'] for g in good], flush=True)
+        return
+    print('照合する作品', len(todo), '件（依頼者の判断済み', len(decisions), '件）', flush=True)
+
     unsure = [u for u in load(P('data', 'anilist-unsure.json'), []) if u['id'] not in decisions] if apply_only else []
     for b in range(0, len(todo), BATCH):
         chunk = todo[b:b + BATCH]
-        data = gql(make_query(len(chunk)), {f's{i}': core(r[1]) for i, r in enumerate(chunk)})
+        results = lookup(chunk, make_query)
         for i, r in enumerate(chunk):
             wid, title, date = r[0], r[1], r[2]
-            kind = 'movie' if wid.startswith('f') else 'tv'
-            cands = ((data.get(f'a{i}') or {}).get('media')) or []
-            res, best, good = judge(kind, title, date[:4], cands)
+            res, best, good = results[i]
             if res == 'sure':
                 match[wid] = best['id']
                 n = cover_name(best)
