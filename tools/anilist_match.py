@@ -33,6 +33,7 @@ def save(path, data, compact=False):
 
 
 last = [0.0]
+fails = [0]   # 続けて拒否された回数。最初から拒否が続くときは早めに止める
 def gql(query, variables):
     for i in range(8):
         wait = 2.1 - (time.time() - last[0])   # 1分30回に収める
@@ -40,9 +41,11 @@ def gql(query, variables):
             time.sleep(wait)
         last[0] = time.time()
         req = urllib.request.Request(API, data=json.dumps({'query': query, 'variables': variables}).encode(),
-                                     headers={'Content-Type': 'application/json', 'Accept': 'application/json'})
+                                     headers={'Content-Type': 'application/json', 'Accept': 'application/json',
+                                              'User-Agent': 'anime-review-list/1.0 (+https://nzanke.github.io/anime-review-list/)'})
         try:
             with urllib.request.urlopen(req, timeout=30) as r:
+                fails[0] = 0
                 return json.load(r).get('data') or {}
         except urllib.error.HTTPError as e:
             if e.code == 429:
@@ -51,6 +54,9 @@ def gql(query, variables):
                 time.sleep(10 * (i + 1)); continue
             body = e.read().decode('utf-8', 'replace')[:300]
             print('問い合わせの誤り', e.code, body, flush=True)
+            fails[0] += 1
+            if fails[0] >= 3:
+                sys.exit('問い合わせが続けて拒否されたので止めます')
             return {}
         except Exception as e:
             time.sleep(5 * (i + 1))
@@ -113,6 +119,15 @@ def main():
     thumbs = load(P('catalog', 'thumbs.json'), {}) if keep else {}
     match = load(P('data', 'anilist-match.json'), {}) if keep else {}
     todo = [] if apply_only else [r for r in rows if r[0] not in decisions and r[0] not in match]
+    if '--test' in sys.argv:
+        sample = [r for r in rows if r[0] in ('f0092', 'f0311', 'f1337', 'f2227')] + rows[3000:3006]
+        q = 'query (' + ', '.join(f'$s{i}: String' for i in range(len(sample))) + ') { ' + ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(len(sample))) + ' }'
+        data = gql(q, {f's{i}': core(r[1]) for i, r in enumerate(sample)})
+        for i, r in enumerate(sample):
+            cands = ((data.get(f'a{i}') or {}).get('media')) or []
+            res, best, good = judge('movie' if r[0].startswith('f') else 'tv', r[1], r[2][:4], cands)
+            print('試し', r[0], r[1], r[2], '→', res, (best or {}).get('title'), cover_name(best), len(cands), '候補', flush=True)
+        return
     print('照合する作品', len(todo), '件（依頼者の判断済み', len(decisions), '件）', flush=True)
 
     def make_query(n):
