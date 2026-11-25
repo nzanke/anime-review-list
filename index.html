@@ -453,7 +453,7 @@ function worksHtml(k,y,ws){
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.iv.length?`<span class="rc" title="インタビュー数">${ic('mic')}${w.iv.length}</span>`:''}${w.sr.length?`<span class="rc" title="資料数">${ic('lib')}${w.sr.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.sr.length?`<span class="rc" title="資料数">${ic('lib')}${w.sr.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
@@ -462,17 +462,26 @@ function worksHtml(k,y,ws){
 // 記事の日付：ネット記事は年月日、紙媒体は年
 const artKey=r=>r.date||(r.year?r.year+'-99':'9999');
 const fmtDate=r=>r.date?r.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1/$2/$3'):(r.year||'');
-const ART={rv:{name:'レビュー',icon:'doc'},iv:{name:'インタビュー',icon:'mic'},sr:{name:'資料',icon:'lib'}};
-const ACCESS={net:'インターネット公開',send:'送信サービス',lib:'館内限定'};
+const ART={rv:{name:'レビュー',icon:'doc'},sr:{name:'資料',icon:'lib'}};
+const SRT={web:['ネット記事','globe'],book:['書籍・雑誌','book'],ndl:['NDL','lib']};
 function srLine(r){
-  const ndl=/(^https?:\/\/)?dl\.ndl\.go\.jp\//.test(r.url||'');
-  const ti=r.media?`「${esc(r.title)}」`:`『${esc(r.title)}』`;
-  const tiL=r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${ti}</a>`:ti;
-  return `<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic('person')}</span>${esc(r.author)}</span>`:''}<span class="ti">${tiL}</span>${r.media?` <span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』</span>`:''}${r.vol?` <span class="y">${esc(r.vol)}</span>`:''}${r.publisher?` <span class="src">${esc(r.publisher)}</span>`:''}${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}${ndl?` <span class="ndl" title="国立国会図書館デジタルコレクション">${ic('lib')}NDL${r.access?'・'+ACCESS[r.access]:''}</span>`:(r.access?` <span class="ndl">${ACCESS[r.access]}</span>`:'')}</span><span class="ops"><button class="ib" data-act="editArt" data-t="sr" title="資料を編集">${ic('pen')}</button><button class="ib del" data-act="delArt" data-t="sr" title="資料を削除">${ic('trash')}</button></span></li>`;
+  const t=r.type||'ndl', link=x=>r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${x}</a>`:x;
+  let body='';
+  if(t==='ndl'){
+    const parts=[];
+    if(r.title) parts.push(`「${esc(r.title)}」`);
+    parts.push(`『${esc(r.book)}』`);
+    body=`<span class="ti">${link(parts.join(''))}</span>${r.publisher?` <span class="src">${esc(r.publisher)}</span>`:''}${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}${r.pages?` <span class="y">p.${esc(r.pages)}</span>`:''} <span class="ndl" title="国立国会図書館デジタルコレクション">${ic('lib')}NDL</span>`;
+  }else if(t==='web'){
+    body=`<span class="ti">${link(`「${esc(r.title)}」`)}</span> <span class="src"><span class="ico">${ic('globe')}</span>${esc(r.media)}</span>${r.date||r.year?` <span class="y">${ic('cal')}${esc(fmtDate(r))}</span>`:''}`;
+  }else{
+    body=`<span class="ti">${link(`「${esc(r.title)}」`)}</span> <span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』${r.publisher?esc(r.publisher):''}</span>${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}`;
+  }
+  return `<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic('person')}</span>${esc(r.author)}</span>`:''}${body}</span><span class="ops"><button class="ib" data-act="editArt" data-t="sr" title="資料を編集">${ic('pen')}</button><button class="ib del" data-act="delArt" data-t="sr" title="資料を削除">${ic('trash')}</button></span></li>`;
 }
 function artSection(w,t){
   const A=ART[t], list=w[t].slice().sort((a,b)=>artKey(a)<artKey(b)?-1:1);
-  if(t!=='rv'&&!list.length&&!editMode) return '';
+  if(t==='sr'&&!list.length&&!editMode) return '';
   let h=`<h3>${ic(A.icon)}${A.name}</h3><ul>`;
   if(!list.length) h+='<li class="empty">まだありません</li>';
   for(const r of list){
@@ -499,7 +508,7 @@ function workBody(w,y){
   if(w.dir) info.push(`<span title="監督">${ic('mega')}${esc(w.dir)}</span>`);
   if(w.title!==w.orig) info.push(`<span title="台帳の題名">台帳：${esc(w.orig)}</span>`);
   h+=`<div class="info">${info.join('')}</div>`;
-  h+=artSection(w,'rv')+artSection(w,'iv')+artSection(w,'sr');
+  h+=artSection(w,'rv')+artSection(w,'sr');
   if(aw.length||editMode){
     h+=`<h3>${ic('trophy')}受賞歴</h3><ul>`;
     if(!aw.length) h+='<li class="empty">まだありません</li>';
@@ -524,16 +533,22 @@ function workForm(e){
   ${btns}</form>`;
 }
 function rvForm(e){
-  if(e.t==='sr') return `<form class="f" data-form="sr"><label>${ic('lib')}資料名<input type="text" name="title" required placeholder="記事名・書名" value="${val(e,'title')}"></label>
-  <label>${ic('person')}著者<input type="text" name="author" placeholder="著者・編者（任意）" value="${val(e,'author')}"></label>
-  <label>${ic('book')}掲載誌<input type="text" name="media" placeholder="雑誌の記事なら誌名（任意）" value="${val(e,'media')}"></label>
-  <label>巻号・頁<input type="text" name="vol" placeholder="例：1979年8月号 p.12-15（任意）" value="${val(e,'vol')}"></label>
-  <label>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
-  <label>${ic('cal')}発行年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
-  <label>公開範囲<select name="access"><option value="">（未記入）</option>${Object.entries(ACCESS).map(([k,v])=>`<option value="${k}"${e.v&&e.v.access===k?' selected':''}>${v}</option>`).join('')}</select></label>
-  <label>${ic('link')}URL<input type="url" name="url" placeholder="https://dl.ndl.go.jp/pid/…" value="${val(e,'url')}"></label>
+  if(e.t==='sr'){
+    const t=(e.v&&e.v.type)||'ndl', sh=(...ks)=>ks.includes(t)?'':' hidden';
+    return `<form class="f" data-form="sr">
+  <div class="seg">${Object.entries(SRT).map(([k,[n,i]])=>`<label><input type="radio" name="type" value="${k}"${t===k?' checked':''}>${ic(i)}${n}</label>`).join('')}</div>
+  <label>${ic('person')}著者名<input type="text" name="author" placeholder="任意" value="${val(e,'author')}"></label>
+  <label><span data-tl>${t==='ndl'?'記事名':'タイトル'}</span><input type="text" name="title" data-req="web book" placeholder="${t==='ndl'?'任意（「」で囲んで表示）':''}" value="${val(e,'title')}"${t==='ndl'?'':' required'}></label>
+  <label data-k="ndl"${sh('ndl')}>${ic('book')}書籍名<input type="text" name="book" data-req="ndl" placeholder="必須（『』で囲んで表示）" value="${val(e,'book')}"${t==='ndl'?' required':''}></label>
+  <label data-k="web book"${sh('web','book')}><span data-ml>${t==='web'?'メディア名':'媒体名'}</span><input type="text" name="media" data-req="web book" value="${val(e,'media')}"${t==='ndl'?'':' required'}></label>
+  <label data-k="book ndl"${sh('book','ndl')}>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
+  <label data-k="book ndl"${sh('book','ndl')}>${ic('cal')}発行年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  <label data-k="web"${sh('web')}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
+  <label data-k="ndl"${sh('ndl')}>ページ<input type="text" name="pages" placeholder="任意（例：12、15、20）" value="${val(e,'pages')}"></label>
+  <label>${ic('link')}URL<input type="url" name="url" data-req="ndl" placeholder="${t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（任意）'}" value="${val(e,'url')}"${t==='ndl'?' required':''}></label>
   ${btns}</form>`;
-  const web=e.v&&e.v.type==='web', iv=e.t==='iv';
+  }
+  const web=e.v&&e.v.type==='web', iv=false;
   return `<form class="f" data-form="art"><label>${ic(iv?'mic':'person')}${iv?'話し手':'著者名'}<input type="text" name="author" value="${val(e,'author')}"${iv?' placeholder="インタビューを受けた人"':''}></label>
   ${iv?`<label>${ic('person')}聞き手<input type="text" name="inter" placeholder="聞き手・構成（任意）" value="${val(e,'inter')}"></label>`:''}
   <label>タイトル<input type="text" name="title" required value="${val(e,'title')}"></label>
@@ -625,6 +640,16 @@ document.addEventListener('click',async ev=>{
   }
 });
 document.addEventListener('change',ev=>{
+  if(ev.target.name==='type'&&ev.target.form.dataset.form==='sr'){
+    const f=ev.target.form, t=ev.target.value;
+    f.querySelectorAll('[data-k]').forEach(x=>x.hidden=!x.dataset.k.split(' ').includes(t));
+    f.querySelectorAll('[data-req]').forEach(x=>x.required=x.dataset.req.split(' ').includes(t));
+    f.querySelector('[data-tl]').textContent=t==='ndl'?'記事名':'タイトル';
+    f.querySelector('[name=title]').placeholder=t==='ndl'?'任意（「」で囲んで表示）':'';
+    f.querySelector('[data-ml]').textContent=t==='web'?'メディア名':'媒体名';
+    f.querySelector('[name=url]').placeholder=t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（任意）';
+    return;
+  }
   if(ev.target.name==='type'){
     const f=ev.target.form, web=ev.target.value==='web';
     f.querySelector('[data-lbl]').textContent=web?'メディア名':'媒体名';
@@ -668,9 +693,11 @@ document.addEventListener('submit',async ev=>{
   }else{
     const s=slot(kind,e.y,e.w);
     if(f.dataset.form==='sr'){
-      const r={id:e.isNew?uid():e.id,title:fd.title};
-      for(const k of ['author','media','vol','publisher','access','url']) if(fd[k]) r[k]=fd[k];
-      if(fd.year) r.year=+fd.year;
+      const t=fd.type, keep={web:['author','title','media','url'],book:['author','title','media','publisher','url'],ndl:['author','title','book','publisher','pages','url']}[t];
+      const r={id:e.isNew?uid():e.id,type:t};
+      for(const k of keep) if(fd[k]) r[k]=fd[k];
+      if(t==='web'&&fd.date){r.date=fd.date;r.year=+fd.date.slice(0,4)}
+      if(t!=='web'&&fd.year) r.year=+fd.year;
       const L=s.sr; if(e.isNew) L.push(r); else L[L.findIndex(x=>x.id===e.id)]=r;
     }else if(f.dataset.form==='art'){
       const web=fd.type==='web';
