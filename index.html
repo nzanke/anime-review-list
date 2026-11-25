@@ -80,6 +80,15 @@ details[open]>summary::before{transform:rotate(45deg)}
 .work[open]>summary{border-bottom:1px solid var(--line)}
 .meta{display:inline-flex;gap:8px;font-size:12px;color:var(--sub);white-space:nowrap}
 .meta .aw{color:var(--gold)}
+.meta .rc{color:var(--acc);font-weight:700}
+.meta .dt{color:var(--sub)}
+.info{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--sub);padding:2px 0 4px}
+.info span{display:inline-flex;align-items:center;gap:3px}
+.tag{font-size:11px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;padding:0 4px;margin-left:4px;font-weight:400}
+.hid{opacity:.55}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.flt{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:4px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)}
+.flt[aria-pressed=true]{border-color:var(--acc);color:var(--acc);background:var(--acc-pale)}
 .wbody{padding:6px 10px 8px}
 .wbody h3{font-size:12px;color:var(--sub);margin:6px 0 2px;display:flex;align-items:center;gap:4px;font-weight:700}
 .wbody ul{list-style:none;margin:0;padding:0}
@@ -113,7 +122,7 @@ form.f .btns button[type=submit]{background:var(--acc);color:#fff}
 /* トースト */
 #toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:8px;padding:8px 10px 8px 14px;display:none;align-items:center;gap:10px;font-size:14px;z-index:20;max-width:92vw}
 #toast.show{display:flex}
-#toast button{background:none;border:1px solid #fff6;color:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+#toast button{white-space:nowrap;flex:none;background:none;border:1px solid #fff6;color:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
 dialog{border:1px solid var(--line);border-radius:10px;max-width:520px;width:92vw;font-size:14px}
 dialog h2{font-size:16px;margin:0 0 8px}
 dialog ol{padding-left:1.3em;margin:6px 0 10px}
@@ -148,6 +157,9 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
 <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-studio" viewBox="0 0 24 24"><path d="M4 21V9l5 3V9l5 3V5h6v16z"/><path d="M8 17h2M14 17h2"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
 </svg>
 
@@ -167,10 +179,10 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 
 <main class="wrap">
   <section id="home">
-    <p>見たい種類を選んでください</p>
+    <p>見たい種類を選んでください（作品はアニメデータベースの台帳から）</p>
     <div class="choice">
-      <button class="m" data-act="kind" data-k="movie"><svg class="i"><use href="#i-film"/></svg>アニメ映画<small>年ごと</small></button>
-      <button class="t" data-act="kind" data-k="tv"><svg class="i"><use href="#i-tv"/></svg>テレビアニメ<small>年・クールごと</small></button>
+      <button class="m" data-act="kind" data-k="movie"><svg class="i"><use href="#i-film"/></svg>アニメ映画<small>年ごと・<span id="nMovie"></span>本</small></button>
+      <button class="t" data-act="kind" data-k="tv"><svg class="i"><use href="#i-tv"/></svg>テレビアニメ<small>年・クールごと・<span id="nTv"></span>作品</small></button>
     </div>
   </section>
   <section id="list" hidden></section>
@@ -203,54 +215,78 @@ const coll=new Intl.Collator('ja');
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const ic=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+// 放送開始月からクール。3・6・9月の25日以降の開始は、次のクールの先行放送とみなす
+const courOf=md=>{let m=parseInt(md,10),d=parseInt((md||'').split('-')[1],10)||0;if(!m)return '冬';if(m%3===0&&m<12&&d>=25)m++;return COURS[Math.floor((m-1)/3)][0]};
 
 let CFG=LS.get('arl-cfg',{token:''});
-let IDX=null;                 // {movie:{年:作品数}, tv:{...}}
-const YEARS={};               // "movie/1997" -> [作品]
+let CIDX=null;   // 台帳の索引 {movie:{年:作品数}, tv:{…}}
+let UIDX=null;   // 編集の索引 {movie:{年:{a:追加数,h:外した数,r:レビュー数,w:受賞数}}, tv:{…}}
+const CAT={};    // "tv/2016" -> 台帳の作品 [[id,題名,月日,制作,監督],…]
+const UD={};     // "tv/2016" -> 編集データ {w:{id:{rv:[],aw:[]}}, add:[], hide:[], fix:{}}
 const loadingYears=new Set();
-let pending=LS.get('arl-pending',{}); // まだGitHubへ送っていないファイル {path: 文字列|null}
+let pending=LS.get('arl-pending',{});
 let kind=null, editMode=false, editing=null, undoStack=[];
+let onlyRv=LS.get('arl-onlyrv',false);
 const openSet=new Set(LS.get('arl-open',[]));
 
 /* ---------- 読み込み ---------- */
-async function getFile(path){
+async function getFile(path,fresh){
   if(path in pending) return pending[path]==null?null:JSON.parse(pending[path]);
   let r;
-  if(CFG.token){
-    r=await fetch(`${API}/contents/${path}?t=${Date.now()}`,{headers:{Authorization:'Bearer '+CFG.token,Accept:'application/vnd.github.raw+json'},cache:'no-store'});
-  }else{
-    r=await fetch(path,{cache:'no-cache'});
-  }
+  if(fresh&&CFG.token) r=await fetch(`${API}/contents/${path}?t=${Date.now()}`,{headers:{Authorization:'Bearer '+CFG.token,Accept:'application/vnd.github.raw+json'},cache:'no-store'});
+  else r=await fetch(path,{cache:'no-cache'});
   if(r.status===404) return null;
   if(!r.ok) throw new Error('読み込み失敗 '+r.status);
   return r.json();
 }
-const yPath=(k,y)=>`data/${k}/${y}.json`;
+const uPath=(k,y)=>`data/${k}/${y}.json`;
+const emptyUD=()=>({w:{},add:[],hide:[],fix:{}});
 async function ensureYear(k,y){
   const key=k+'/'+y;
-  if(YEARS[key]) return YEARS[key];
-  YEARS[key]=(IDX[k][y]?await getFile(yPath(k,y)):null)||[];
-  return YEARS[key];
+  if(CAT[key]&&UD[key]) return;
+  const [c,u]=await Promise.all([
+    CAT[key]||(CIDX[k][y]?getFile(`catalog/${k}/${y}.json`):[]),
+    UD[key]||(UIDX[k][y]?getFile(uPath(k,y),true):null)]);
+  CAT[key]=c||[]; UD[key]=Object.assign(emptyUD(),u||{});
+}
+function ud(k,y){return UD[k+'/'+y]}
+function slot(k,y,id){const u=ud(k,y);return u.w[id]=u.w[id]||{rv:[],aw:[]}}
+/* 台帳と編集を合わせた作品の一覧 */
+function works(k,y){
+  const key=k+'/'+y, u=UD[key]; if(!u||!CAT[key]) return [];
+  const hide=new Set(u.hide), list=[];
+  const mk=(id,title,md,studio,dir,added,cour)=>{
+    const f=u.fix[id]||{}, s=u.w[id]||{};
+    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title};
+  };
+  for(const [id,t,md,st,dr] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false));
+  for(const a of u.add) list.push(mk(a.id,a.title,a.md||'','','',true,a.cour));
+  return list;
+}
+function hiddenWorks(k,y){
+  const key=k+'/'+y, u=UD[key]; if(!u) return [];
+  const hide=new Set(u.hide);
+  return CAT[key].filter(w=>hide.has(w[0]));
 }
 
 /* ---------- 保存 ---------- */
 let syncTimer=null, syncing=false;
 function markDirty(k,y){
-  const key=k+'/'+y, list=YEARS[key];
-  if(list.length){IDX[k][y]=list.length;pending[yPath(k,y)]=JSON.stringify(sortWorks(list),null,1)}
-  else{delete IDX[k][y];pending[yPath(k,y)]=null}
-  pending['data/index.json']=JSON.stringify(IDX,null,1);
+  const u=ud(k,y);
+  for(const id in u.w){if(!u.w[id].rv.length&&!u.w[id].aw.length) delete u.w[id]}
+  for(const id in u.fix){if(!u.fix[id].title&&!u.fix[id].cour) delete u.fix[id]}
+  let r=0,a=0; for(const id in u.w){r+=u.w[id].rv.length;a+=u.w[id].aw.length}
+  const empty=!u.add.length&&!u.hide.length&&!Object.keys(u.w).length&&!Object.keys(u.fix).length;
+  if(empty){delete UIDX[k][y];pending[uPath(k,y)]=null}
+  else{UIDX[k][y]={a:u.add.length,h:u.hide.length,r,w:a};pending[uPath(k,y)]=JSON.stringify(u,null,1)}
+  pending['data/index.json']=JSON.stringify(UIDX,null,1);
   LS.set('arl-pending',pending);
   scheduleSync();
 }
-function scheduleSync(){
-  setStatus();
-  clearTimeout(syncTimer);
-  if(CFG.token) syncTimer=setTimeout(sync,1500);
-}
+function scheduleSync(){setStatus();clearTimeout(syncTimer);if(CFG.token) syncTimer=setTimeout(sync,1500)}
 async function gh(method,path,body){
   const r=await fetch(API+path,{method,headers:{Authorization:'Bearer '+CFG.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store'});
-  if(!r.ok) throw new Error(method+' '+path+' '+r.status);
+  if(!r.ok) throw new Error(method+' '+path.split('/').slice(0,3).join('/')+' '+r.status);
   return r.json();
 }
 async function sync(){
@@ -261,37 +297,32 @@ async function sync(){
   try{
     const ref=await gh('GET','/git/ref/heads/main');
     const base=await gh('GET','/git/commits/'+ref.object.sha);
-    const tree=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:Object.entries(snap).map(([path,c])=>c==null?{path,mode:'100644',type:'blob',sha:null}:{path,mode:'100644',type:'blob',content:c+'\n'})});
-    const cm=await gh('POST','/git/commits',{message:'ページ上の編集を保存',tree:tree.sha,parents:[ref.object.sha]});
-    await gh('PATCH','/git/refs/heads/main',{sha:cm.sha});
+    // 消す指示は、実在するファイルだけに絞る
+    const dels=Object.entries(snap).filter(([,c])=>c==null).map(([p])=>p);
+    let exist=new Set();
+    if(dels.length){const t=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1');exist=new Set(t.tree.map(x=>x.path))}
+    const entries=Object.entries(snap).filter(([p,c])=>c!=null||exist.has(p))
+      .map(([path,c])=>c==null?{path,mode:'100644',type:'blob',sha:null}:{path,mode:'100644',type:'blob',content:c+'\n'});
+    if(entries.length){
+      const tree=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:entries});
+      const cm=await gh('POST','/git/commits',{message:'ページ上の編集を保存',tree:tree.sha,parents:[ref.object.sha]});
+      await gh('PATCH','/git/refs/heads/main',{sha:cm.sha});
+    }
     for(const [p,c] of Object.entries(snap)) if(pending[p]===c) delete pending[p];
     LS.set('arl-pending',pending);
     syncing=false;setStatus();
     if(Object.keys(pending).length) scheduleSync();
-  }catch(e){
-    syncing=false;
-    // 削除対象が存在しないなどで木の作成に失敗したとき：存在しないファイルの削除指示を外して再試行
-    if(/trees 422/.test(e.message)){
-      for(const [p,c] of Object.entries(snap)) if(c==null && pending[p]===null) delete pending[p];
-      LS.set('arl-pending',pending);
-    }
-    setStatus('保存できませんでした（'+e.message+'）',true);
-    console.error(e);
-  }
+  }catch(e){syncing=false;setStatus('保存失敗：'+e.message,true);console.error(e)}
 }
 function setStatus(msg,ng){
   const s=$('#status'), n=Object.keys(pending).length;
-  s.classList.toggle('ng',!!ng || (!CFG.token&&n>0));
-  if(!msg){
-    if(!CFG.token) msg=n?'未保存':'保存未設定';
-    else msg=n?'保存待ち':'保存済み';
-  }
-  s.title=CFG.token?msg:'保存の設定（鍵）が未設定のため、編集はこのブラウザにだけ記録されています';
-  s.innerHTML=ic(n?'cloud':'check')+esc(msg.length>12?'保存失敗':msg);
+  s.classList.toggle('ng',!!ng||(!CFG.token&&n>0));
+  if(!msg) msg=!CFG.token?(n?'未保存':'保存未設定'):(n?'保存待ち':'保存済み');
+  s.title=ng?msg:(CFG.token?msg:'保存の設定（鍵）が未設定のため、編集はこのブラウザにだけ記録されています');
+  s.innerHTML=ic(n?'cloud':'check')+esc(ng?'保存失敗':msg);
 }
 
 /* ---------- 表示 ---------- */
-function sortWorks(list){return list.sort((a,b)=>(a.cour&&b.cour?COURS.findIndex(c=>c[0]===a.cour)-COURS.findIndex(c=>c[0]===b.cour):0)||coll.compare(a.title,b.title))}
 function setKind(k){
   kind=k;
   document.body.classList.toggle('k-tv',k==='tv');
@@ -300,76 +331,102 @@ function setKind(k){
   if(k){ if(location.hash!=='#'+k) history.replaceState(null,'','#'+k); render(); }
   document.title=(k?KINDNAME[k]+'｜':'')+'アニメレビュー索引';
 }
+function yearCount(k,y){const u=UIDX[k][y]||{};return (CIDX[k][y]||0)+(u.a||0)-(u.h||0)}
 function decades(k){
+  const ys=new Set([...Object.keys(CIDX[k]),...Object.keys(UIDX[k]).filter(y=>UIDX[k][y].a)]);
   const m={};
-  for(const y of Object.keys(IDX[k])){const d=Math.floor(y/10)*10;(m[d]=m[d]||[]).push(+y)}
+  for(const y of ys){if(onlyRv&&!(UIDX[k][y]||{}).r&&!(UIDX[k][y]||{}).w) continue;const d=Math.floor(y/10)*10;(m[d]=m[d]||[]).push(+y)}
   return Object.entries(m).map(([d,ys])=>[+d,ys.sort((a,b)=>b-a)]).sort((a,b)=>b[0]-a[0]);
 }
 const op=id=>openSet.has(id)?' open':'';
+const kIcon=k=>ic(k==='tv'?'tv':'film');
+function cntHtml(k,n,r,w){return `<span class="cnt">${r?`<span class="rc" style="color:var(--acc);font-weight:700">${ic('doc')}${r}</span>`:''}${w?`<span style="color:var(--gold)">${ic('trophy')}${w}</span>`:''}${n==null?'':kIcon(k)+n}</span>`}
 function render(){
-  if(!IDX||!kind) return;
+  if(!CIDX||!kind) return;
   const k=kind, decs=decades(k);
-  let h='';
-  if(editMode) h+= editing&&editing.t==='work'&&editing.isNew&&editing.top ? workForm(editing) : `<button class="add" data-act="addWork" data-top="1">${ic('plus')}作品を追加（年を指定）</button>`;
-  if(!decs.length) h+=`<div class="notice">まだ作品がありません。${editMode?'':'右上の鉛筆から編集モードにして追加できます。'}</div>`;
+  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}レビューのある作品だけ</button>`;
+  if(editMode&&!(editing&&editing.t==='work'&&editing.isNew&&editing.top)) h+=`<button class="add" data-act="addWork" data-top="1">${ic('plus')}台帳にない作品を追加</button>`;
+  h+='</div>';
+  if(editMode&&editing&&editing.t==='work'&&editing.isNew&&editing.top) h+=workForm(editing);
+  if(!decs.length) h+=`<div class="notice">${onlyRv?'レビューのある作品はまだありません。':'作品がありません。'}</div>`;
   for(const [d,ys] of decs){
-    const n=ys.reduce((s,y)=>s+IDX[k][y],0), did=`${k}-d${d}`;
-    h+=`<details class="dec" data-id="${did}"${op(did)}><summary>${d}年代<span class="cnt">${ic(k==='tv'?'tv':'film')}${n}</span></summary>`;
-    for(const y of ys){
-      const yid=`${k}-y${y}`, key=k+'/'+y;
-      h+=`<details class="yr" data-id="${yid}" data-y="${y}"${op(yid)}><summary>${y}年<span class="cnt">${ic(k==='tv'?'tv':'film')}${IDX[k][y]}</span></summary>`;
-      if(openSet.has(yid)) h+= YEARS[key]?yearBody(k,y):'<div class="loading">読み込み中…</div>';
+    let n=0,r=0,w=0; for(const y of ys){n+=yearCount(k,y);r+=(UIDX[k][y]||{}).r||0;w+=(UIDX[k][y]||{}).w||0}
+    const did=`${k}-d${d}`;
+    h+=`<details class="dec" data-id="${did}"${op(did)}><summary>${d}年代${cntHtml(k,onlyRv?null:n,r,w)}</summary>`;
+    if(openSet.has(did)) for(const y of ys){
+      const yid=`${k}-y${y}`, key=k+'/'+y, u=UIDX[k][y]||{};
+      h+=`<details class="yr" data-id="${yid}" data-y="${y}"${op(yid)}><summary>${y}年${cntHtml(k,onlyRv?null:yearCount(k,y),u.r,u.w)}</summary>`;
+      if(openSet.has(yid)) h+= CAT[key]&&UD[key]?yearBody(k,y):'<div class="loading">読み込み中…</div>';
       h+='</details>';
     }
     h+='</details>';
   }
   $('#list').innerHTML=h;
-  // 開いている年でまだ読んでいないものを読む
-  for(const id of openSet){const m=id.match(/^(movie|tv)-y(\d+)$/); if(m&&m[1]===k&&IDX[k][m[2]]&&!YEARS[k+'/'+m[2]]) loadYear(k,m[2])}
-  const f=$('#list form.f input[type=text]'); if(f&&!f.dataset.focused){f.dataset.focused=1;f.focus()}
+  for(const id of openSet){const m=id.match(/^(movie|tv)-y(\d+)$/); if(m&&m[1]===k&&openSet.has(`${k}-d${Math.floor(m[2]/10)*10}`)&&!(CAT[k+'/'+m[2]]&&UD[k+'/'+m[2]])) loadYear(k,m[2])}
+  const f=$('#list form.f input[type=text]'); if(f&&document.activeElement.tagName!=='INPUT') f.focus();
 }
 async function loadYear(k,y){
   const key=k+'/'+y; if(loadingYears.has(key)) return;
   loadingYears.add(key);
-  try{await ensureYear(k,y)}catch(e){YEARS[key]=null;toast('読み込めませんでした');}
+  try{await ensureYear(k,y)}catch(e){toast('読み込めませんでした');console.error(e)}
   loadingYears.delete(key); render();
 }
+function filt(ws){return onlyRv?ws.filter(w=>w.rv.length||w.aw.length):ws}
 function yearBody(k,y){
-  const list=YEARS[k+'/'+y];
+  const all=works(k,y);
   let h='';
   if(k==='tv'){
     for(const [c,mo] of COURS){
-      const ws=list.filter(w=>w.cour===c);
+      const ws=filt(all.filter(w=>w.cour===c));
       const adding=editing&&editing.t==='work'&&editing.isNew&&!editing.top&&editing.y==y&&editing.cour===c;
-      if(!ws.length&&!editMode) continue;
+      if(!ws.length&&!adding) continue;
       const cid=`tv-c${y}${c}`;
-      h+=`<details class="cour" data-id="${cid}"${op(cid)||(adding?' open':'')}><summary>${c}<span class="months">${mo}</span><span class="cnt">${ws.length}</span></summary>`;
-      h+=worksHtml(k,y,ws);
-      h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" data-cour="${c}">${ic('plus')}${c}クールに作品を追加</button>`;
+      const r=ws.reduce((s,w)=>s+w.rv.length,0), a=ws.reduce((s,w)=>s+w.aw.length,0);
+      h+=`<details class="cour" data-id="${cid}"${op(cid)||(adding?' open':'')}><summary>${c}<span class="months">${mo}</span>${cntHtml(k,ws.length,r,a)}</summary>`;
+      if(openSet.has(cid)||adding){
+        h+=worksHtml(k,y,ws);
+        h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" data-cour="${c}">${ic('plus')}${c}クールに台帳にない作品を追加</button>`;
+      }
       h+='</details>';
     }
   }else{
-    h+=worksHtml(k,y,list);
+    h+=worksHtml(k,y,filt(all));
     const adding=editing&&editing.t==='work'&&editing.isNew&&!editing.top&&editing.y==y;
-    h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" style="margin-left:14px">${ic('plus')}${y}年に作品を追加</button>`;
+    h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" style="margin-left:14px">${ic('plus')}${y}年に台帳にない作品を追加</button>`;
+  }
+  if(editMode){
+    const hw=hiddenWorks(k,y);
+    if(hw.length){
+      const hid=`${k}-h${y}`;
+      h+=`<details class="cour hid" data-id="${hid}"${op(hid)}><summary>${ic('eye')}一覧から外した作品<span class="cnt">${hw.length}</span></summary><ul class="works">`;
+      for(const [id,t] of hw) h+=`<li style="display:flex;align-items:center;gap:6px;padding:2px 0">${esc(t)}<button class="ib" data-act="unhide" data-id="${id}" data-y="${y}" title="一覧に戻す">${ic('undo')}</button></li>`;
+      h+='</ul></details>';
+    }
   }
   return h;
 }
+const fmtMd=md=>md?md.replace(/^0?(\d+)(?:-0?(\d+))?$/,(_,m,d)=>d?`${m}/${d}`:`${m}月`):'';
 function worksHtml(k,y,ws){
   let h='<ul class="works">';
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
-    const wid='w-'+w.id, rv=w.reviews||[], aw=w.awards||[];
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary><span class="t">${esc(w.title)}</span><span class="meta"><span title="レビュー数">${ic('doc')}${rv.length}</span>${aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="作品を削除">${ic('trash')}</button></span></summary>`;
-    if(openSet.has(wid)) h+=workBody(w);
+    const wid='w-'+w.id;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary><span class="t">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span><span class="meta">${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:''}${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
   return h+'</ul>';
 }
-function workBody(w){
-  const rv=(w.reviews||[]).slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
-  const aw=(w.awards||[]).slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
+function workBody(w,y){
+  const rv=w.rv.slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
+  const aw=w.aw.slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
   let h='<div class="wbody">';
+  const info=[];
+  info.push(`<span title="${kind==='tv'?'放送開始':'公開日'}">${ic('cal')}${y}${w.md?'/'+fmtMd(w.md).replace('月',''):''}</span>`);
+  if(w.studio) info.push(`<span title="制作">${ic('studio')}${esc(w.studio)}</span>`);
+  if(w.dir) info.push(`<span title="監督">${ic('mega')}${esc(w.dir)}</span>`);
+  if(w.title!==w.orig) info.push(`<span title="台帳の題名">台帳：${esc(w.orig)}</span>`);
+  h+=`<div class="info">${info.join('')}</div>`;
   h+=`<h3>${ic('doc')}レビュー</h3><ul>`;
   if(!rv.length) h+='<li class="empty">まだありません</li>';
   for(const r of rv){
@@ -399,9 +456,9 @@ function workBody(w){
 const val=(e,f)=>esc(e.v&&e.v[f]!=null?e.v[f]:'');
 const btns=`<div class="btns"><button type="button" data-act="cancel">${ic('x')}やめる</button><button type="submit">${ic('check')}決定</button></div>`;
 function workForm(e){
-  const isTv=kind==='tv';
+  const isTv=kind==='tv', yearEditable=e.isNew||e.added;
   return `<form class="f" data-form="work"><label>作品名<input type="text" name="title" required value="${val(e,'title')}"></label>
-  <label>年<input type="number" name="year" required min="1900" max="2100" value="${esc(e.y||'')}"></label>
+  <label>年<input type="number" name="year" required min="1900" max="2100" value="${esc(e.y||'')}"${yearEditable?'':' readonly title="台帳の作品は年を変えられません"'}></label>
   ${isTv?`<label>クール<select name="cour">${COURS.map(([c,m])=>`<option value="${c}"${e.cour===c?' selected':''}>${c}（${m}）</option>`).join('')}</select></label>`:''}
   ${btns}</form>`;
 }
@@ -424,8 +481,11 @@ function awForm(e){
 }
 
 /* ---------- 操作 ---------- */
-function findWork(y,id){const l=YEARS[kind+'/'+y];return l&&l.find(w=>w.id===id)}
-function ctx(el){const d=el.closest('details.work');return d?{y:d.dataset.y,id:d.dataset.w,w:findWork(d.dataset.y,d.dataset.w)}:null}
+function ctx(el){
+  const d=el.closest('details.work'); if(!d) return null;
+  const w=works(kind,d.dataset.y).find(x=>x.id===d.dataset.w);
+  return {y:d.dataset.y,id:d.dataset.w,w};
+}
 function toast(msg,canUndo){
   const t=$('#toast');$('#toastMsg').textContent=msg;
   t.querySelector('button').hidden=!canUndo;t.classList.add('show');
@@ -434,7 +494,7 @@ function toast(msg,canUndo){
 document.addEventListener('click',async ev=>{
   const b=ev.target.closest('[data-act]'); if(!b) return;
   const act=b.dataset.act;
-  if(b.closest('summary')&&act!=='kind'){ev.preventDefault();ev.stopPropagation()}
+  if(b.closest('summary')){ev.preventDefault();ev.stopPropagation()}
   const c=ctx(b);
   switch(act){
     case 'kind': editing=null; setKind(b.dataset.k); break;
@@ -442,6 +502,7 @@ document.addEventListener('click',async ev=>{
       editMode=!editMode; editing=null;
       document.body.classList.toggle('edit',editMode); b.classList.toggle('on',editMode);
       setStatus(); render(); break;
+    case 'onlyRv': onlyRv=!onlyRv; LS.set('arl-onlyrv',onlyRv); render(); break;
     case 'token': $('#tokenIn').value=CFG.token; $('#tokenDlg').showModal(); break;
     case 'tokenClose': $('#tokenDlg').close(); break;
     case 'tokenClear': CFG.token=''; LS.set('arl-cfg',CFG); $('#tokenIn').value=''; setStatus(); break;
@@ -451,33 +512,36 @@ document.addEventListener('click',async ev=>{
       if(b.dataset.top) editing={t:'work',isNew:true,top:true,y:new Date().getFullYear(),cour:'冬'};
       else editing={t:'work',isNew:true,y:b.dataset.y,cour:b.dataset.cour||null};
       render(); break;
-    case 'editWork': editing={t:'work',id:c.id,y:c.y,cour:c.w.cour,v:c.w}; render(); break;
+    case 'editWork': editing={t:'work',id:c.id,y:c.y,cour:c.w.cour,added:c.w.added,v:c.w}; render(); break;
     case 'delWork': {
-      const list=YEARS[kind+'/'+c.y], i=list.indexOf(c.w);
-      list.splice(i,1); undoStack.push({k:kind,y:c.y,type:'work',item:c.w,i});
-      editing=null; markDirty(kind,c.y); render(); toast(`「${c.w.title}」を削除しました`,true); break;
+      const u=ud(kind,c.y);
+      if(c.w.added){const i=u.add.findIndex(a=>a.id===c.id);undoStack.push({k:kind,y:c.y,type:'add',item:u.add[i],i});u.add.splice(i,1)}
+      else{u.hide.push(c.id);undoStack.push({k:kind,y:c.y,type:'hide',id:c.id})}
+      editing=null; markDirty(kind,c.y); render(); toast(`「${c.w.title}」を一覧から外しました`,true); break;
     }
-    case 'addRv': editing={t:'rv',isNew:true,w:c.id,y:c.y,v:{year:''}}; openSet.add('w-'+c.id); render(); break;
-    case 'editRv': {const id=b.closest('[data-r]').dataset.r; editing={t:'rv',id,w:c.id,y:c.y,v:c.w.reviews.find(r=>r.id===id)}; render(); break}
+    case 'unhide': {const u=ud(kind,b.dataset.y);u.hide=u.hide.filter(x=>x!==b.dataset.id);markDirty(kind,b.dataset.y);render();break}
+    case 'addRv': editing={t:'rv',isNew:true,w:c.id,y:c.y,v:{}}; openSet.add('w-'+c.id); render(); break;
+    case 'editRv': {const id=b.closest('[data-r]').dataset.r; editing={t:'rv',id,w:c.id,y:c.y,v:c.w.rv.find(r=>r.id===id)}; render(); break}
     case 'delRv': {
-      const id=b.closest('[data-r]').dataset.r, i=c.w.reviews.findIndex(r=>r.id===id), item=c.w.reviews[i];
-      c.w.reviews.splice(i,1); undoStack.push({k:kind,y:c.y,type:'rv',w:c.id,item,i});
+      const s=slot(kind,c.y,c.id), id=b.closest('[data-r]').dataset.r, i=s.rv.findIndex(r=>r.id===id), item=s.rv[i];
+      s.rv.splice(i,1); undoStack.push({k:kind,y:c.y,type:'rv',w:c.id,item,i});
       markDirty(kind,c.y); render(); toast(`レビュー「${item.title}」を削除しました`,true); break;
     }
     case 'addAw': editing={t:'aw',isNew:true,w:c.id,y:c.y,v:{year:c.y}}; openSet.add('w-'+c.id); render(); break;
-    case 'editAw': {const id=b.closest('[data-a]').dataset.a; editing={t:'aw',id,w:c.id,y:c.y,v:c.w.awards.find(a=>a.id===id)}; render(); break}
+    case 'editAw': {const id=b.closest('[data-a]').dataset.a; editing={t:'aw',id,w:c.id,y:c.y,v:c.w.aw.find(a=>a.id===id)}; render(); break}
     case 'delAw': {
-      const id=b.closest('[data-a]').dataset.a, i=c.w.awards.findIndex(a=>a.id===id), item=c.w.awards[i];
-      c.w.awards.splice(i,1); undoStack.push({k:kind,y:c.y,type:'aw',w:c.id,item,i});
+      const s=slot(kind,c.y,c.id), id=b.closest('[data-a]').dataset.a, i=s.aw.findIndex(a=>a.id===id), item=s.aw[i];
+      s.aw.splice(i,1); undoStack.push({k:kind,y:c.y,type:'aw',w:c.id,item,i});
       markDirty(kind,c.y); render(); toast(`受賞歴「${item.name}」を削除しました`,true); break;
     }
     case 'undo': {
       const u=undoStack.pop(); if(!u) break;
-      const list=await ensureYear(u.k,u.y);
-      if(u.type==='work') list.splice(u.i,0,u.item);
-      else{const w=list.find(x=>x.id===u.w); if(w){const arr=u.type==='rv'?(w.reviews=w.reviews||[]):(w.awards=w.awards||[]); arr.splice(u.i,0,u.item)}}
+      await ensureYear(u.k,u.y); const d=ud(u.k,u.y);
+      if(u.type==='add') d.add.splice(u.i,0,u.item);
+      else if(u.type==='hide') d.hide=d.hide.filter(x=>x!==u.id);
+      else{const s=slot(u.k,u.y,u.w);(u.type==='rv'?s.rv:s.aw).splice(u.i,0,u.item)}
       markDirty(u.k,u.y); render();
-      if(undoStack.length) toast('元に戻しました（さらに戻せます）',true); else {toast('元に戻しました');}
+      toast(undoStack.length?'元に戻しました（さらに戻せます）':'元に戻しました',undoStack.length>0);
       break;
     }
   }
@@ -495,34 +559,44 @@ document.addEventListener('submit',async ev=>{
   for(const k in fd) fd[k]=String(fd[k]).trim();
   if(f.dataset.form==='work'){
     const y=String(parseInt(fd.year,10)); if(!(+y>1900)) return;
-    const list=await ensureYear(kind,y);
     if(e.isNew){
-      const w={id:uid(),title:fd.title,reviews:[],awards:[]}; if(kind==='tv') w.cour=fd.cour;
-      list.push(w); markDirty(kind,y);
+      if(!UIDX[kind][y]) UIDX[kind][y]={};
+      await ensureYear(kind,y);
+      const a={id:'u'+uid(),title:fd.title}; if(kind==='tv') a.cour=fd.cour;
+      ud(kind,y).add.push(a); markDirty(kind,y);
       openSet.add(`${kind}-d${Math.floor(y/10)*10}`); openSet.add(`${kind}-y${y}`); if(kind==='tv') openSet.add(`tv-c${y}${fd.cour}`);
-      toast(`「${w.title}」を追加しました`);
-      // 続けて同じ場所に追加できるよう、フォームを開いたままにする
+      toast(`「${a.title}」を追加しました`);
       editing={...e,y,cour:fd.cour||e.cour,v:null}; saveOpen(); render();
       const inp=$('#list form.f input[name=title]'); if(inp){inp.value='';inp.focus()}
       return;
     }
-    const old=YEARS[kind+'/'+e.y], w=old.find(x=>x.id===e.id);
-    w.title=fd.title; if(kind==='tv') w.cour=fd.cour;
-    if(y!==String(e.y)){old.splice(old.indexOf(w),1);list.push(w);markDirty(kind,e.y);openSet.add(`${kind}-d${Math.floor(y/10)*10}`);openSet.add(`${kind}-y${y}`)}
-    markDirty(kind,y);
+    const u=ud(kind,e.y);
+    if(e.added){
+      const i=u.add.findIndex(a=>a.id===e.id), a=u.add[i];
+      a.title=fd.title; if(kind==='tv') a.cour=fd.cour;
+      if(y!==String(e.y)){
+        u.add.splice(i,1); if(!UIDX[kind][y]) UIDX[kind][y]={}; await ensureYear(kind,y);
+        const s=u.w[e.id]; delete u.w[e.id]; const nu=ud(kind,y); nu.add.push(a); if(s) nu.w[e.id]=s;
+        markDirty(kind,y); openSet.add(`${kind}-d${Math.floor(y/10)*10}`); openSet.add(`${kind}-y${y}`);
+      }
+    }else{
+      const w=works(kind,e.y).find(x=>x.id===e.id), fx={};
+      if(fd.title!==w.orig) fx.title=fd.title;
+      if(kind==='tv'&&fd.cour!==courOf(w.md)) fx.cour=fd.cour;
+      u.fix[e.id]=fx;
+    }
+    markDirty(kind,e.y);
   }else{
-    const w=findWork(e.y,e.w); if(!w) return;
+    const s=slot(kind,e.y,e.w);
     if(f.dataset.form==='rv'){
       const r={id:e.isNew?uid():e.id,author:fd.author,title:fd.title,type:fd.type,media:fd.media,year:fd.year?+fd.year:'',url:fd.url};
       if(fd.type==='paper'&&fd.publisher) r.publisher=fd.publisher;
       for(const k of ['author','year','url']) if(!r[k]) delete r[k];
-      w.reviews=w.reviews||[];
-      if(e.isNew) w.reviews.push(r); else w.reviews[w.reviews.findIndex(x=>x.id===e.id)]=r;
+      if(e.isNew) s.rv.push(r); else s.rv[s.rv.findIndex(x=>x.id===e.id)]=r;
     }else{
       const a={id:e.isNew?uid():e.id,name:fd.name,prize:fd.prize,year:fd.year?+fd.year:''};
       if(!a.prize) delete a.prize; if(!a.year) delete a.year;
-      w.awards=w.awards||[];
-      if(e.isNew) w.awards.push(a); else w.awards[w.awards.findIndex(x=>x.id===e.id)]=a;
+      if(e.isNew) s.aw.push(a); else s.aw[s.aw.findIndex(x=>x.id===e.id)]=a;
     }
     markDirty(kind,e.y);
   }
@@ -535,17 +609,20 @@ document.addEventListener('toggle',ev=>{
   if(d.open===openSet.has(id)) return;
   if(d.open) openSet.add(id); else openSet.delete(id);
   saveOpen();
-  if(d.open){
-    if(d.classList.contains('yr')){const y=d.dataset.y; if(!YEARS[kind+'/'+y]) loadYear(kind,y); else render()}
-    else if(d.classList.contains('work')){const c=ctx(d); if(c&&c.w&&!d.querySelector('.wbody')) d.insertAdjacentHTML('beforeend',workBody(c.w))}
-  }
+  if(!d.open) return;
+  if(d.classList.contains('work')){const c=ctx(d); if(c&&c.w&&!d.querySelector('.wbody')) d.insertAdjacentHTML('beforeend',workBody(c.w,c.y))}
+  else if(d.classList.contains('yr')){const y=d.dataset.y; if(!(CAT[kind+'/'+y]&&UD[kind+'/'+y])) {render();loadYear(kind,y)} else render()}
+  else render();
 },true);
 window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);setKind(k==='movie'||k==='tv'?k:null)});
 
 /* ---------- 起動 ---------- */
 (async()=>{
-  try{IDX=await getFile('data/index.json')}catch(e){console.error(e)}
-  IDX=IDX||{movie:{},tv:{}}; IDX.movie=IDX.movie||{}; IDX.tv=IDX.tv||{};
+  try{[CIDX,UIDX]=await Promise.all([getFile('catalog/index.json'),getFile('data/index.json',true)])}catch(e){console.error(e)}
+  CIDX=CIDX||{movie:{},tv:{}};
+  UIDX=UIDX||{}; UIDX.movie=UIDX.movie||{}; UIDX.tv=UIDX.tv||{};
+  const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
+  $('#nMovie').textContent=sum(CIDX.movie).toLocaleString(); $('#nTv').textContent=sum(CIDX.tv).toLocaleString();
   setStatus();
   const k=location.hash.slice(1); setKind(k==='movie'||k==='tv'?k:null);
   if(CFG.token&&Object.keys(pending).length) scheduleSync();
