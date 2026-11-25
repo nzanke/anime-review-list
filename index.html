@@ -34,6 +34,10 @@ header h1{font-size:16px;margin:0;flex:1;white-space:nowrap}
 header h1 a{text-decoration:none}
 .ib{border:0;background:none;cursor:pointer;padding:6px;border-radius:6px;color:var(--sub);line-height:1;display:inline-flex;align-items:center;gap:4px;text-decoration:none;font-size:13px}
 .ib:hover{background:var(--acc-pale);color:var(--acc)}
+.ptabs{display:flex;gap:2px;background:hsl(222 16% 94%);border-radius:8px;padding:2px;flex:none}
+.ptabs a{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:6px;font-size:13px;color:var(--sub);text-decoration:none;white-space:nowrap}
+.ptabs a[aria-current=page]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 2px hsl(222 20% 40%/.18)}
+.ptabs a:hover:not([aria-current]){color:var(--ink)}
 /* 検索 */
 #search{padding:16px 0 8px}
 .box{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:0 12px;height:46px}
@@ -134,7 +138,7 @@ footer#credit{font-size:11px;color:var(--sub);padding:18px 14px 30px;line-height
 </svg>
 <header><div class="wrap">
   <h1><a href="./">アニメレビュー索引</a></h1>
-  <a class="ib" href="./edit.html" title="編集画面"><svg class="i"><use href="#i-pen"/></svg></a>
+  <nav class="ptabs"><a href="./" aria-current="page"><svg class="i"><use href="#i-search"/></svg>閲覧</a><a href="./edit.html"><svg class="i"><use href="#i-pen"/></svg>編集</a></nav>
 </div></header>
 
 <main class="wrap">

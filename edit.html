@@ -50,6 +50,11 @@ body.edit #status{display:inline-flex}
 .editbar{display:none;background:var(--acc-pale);color:var(--acc);font-size:13px;padding:6px 0}
 body.edit .editbar{display:block}
 .editbar .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ptabs{display:flex;gap:2px;background:hsl(222 16% 94%);border-radius:8px;padding:2px;flex:none}
+.ptabs a{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:6px;font-size:13px;color:var(--sub);text-decoration:none;white-space:nowrap}
+.ptabs a[aria-current=page]{background:var(--card);color:var(--ink);font-weight:700;box-shadow:0 1px 2px hsl(222 20% 40%/.18)}
+.ptabs a:hover:not([aria-current]){color:var(--ink)}
+@media (max-width:480px){.ptabs a{padding:4px 8px}}
 /* トップ */
 #home{padding:40px 0}
 #home p{color:var(--sub);text-align:center;margin:0 0 20px}
@@ -198,14 +203,14 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 </svg>
 
 <header><div class="wrap">
-  <h1><a href="./edit.html">アニメレビュー索引<small style="font-weight:400;color:var(--sub);font-size:12px">　編集</small></a></h1>
+  <h1><a href="./edit.html">アニメレビュー索引</a></h1>
+  <nav class="ptabs"><a href="./"><svg class="i"><use href="#i-eye"/></svg>閲覧</a><a href="./edit.html" aria-current="page"><svg class="i"><use href="#i-pen"/></svg>編集</a></nav>
   <div class="tabs" id="tabs" hidden>
     <button class="tab" data-act="kind" data-k="movie"><svg class="i"><use href="#i-film"/></svg><span>映画</span></button>
     <button class="tab" data-act="kind" data-k="tv"><svg class="i"><use href="#i-tv"/></svg><span>テレビ</span></button>
   </div>
   <span id="status"></span>
-  <a class="ib" href="./" title="閲覧ページへ"><svg class="i"><use href="#i-eye"/></svg></a>
-  <button class="ib" id="editBtn" data-act="edit" title="編集モード"><svg class="i"><use href="#i-pen"/></svg></button>
+    <button class="ib" id="editBtn" data-act="edit" title="編集モード"><svg class="i"><use href="#i-pen"/></svg></button>
 </div></header>
 <div class="editbar"><div class="wrap">
   <svg class="i"><use href="#i-pen"/></svg>編集モード（削除は確認なしで即反映、直後なら元に戻せます）
