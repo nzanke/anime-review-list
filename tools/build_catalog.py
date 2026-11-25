@@ -10,6 +10,10 @@
 import json, os, re, shutil, sqlite3, sys
 
 db = sys.argv[1]
+# 依頼者が「完全に不要」とした作品（作品ID→題名）。書き出しから外す
+here = os.path.dirname(os.path.abspath(__file__))
+exclude_path = os.path.join(here, '..', 'data', 'exclude.json')
+exclude = json.load(open(exclude_path, encoding='utf-8')) if os.path.exists(exclude_path) else {}
 import csv
 film_csv = os.path.join(os.path.dirname(os.path.abspath(db)), '..', 'films', '映画台帳.csv')
 minutes = {}
@@ -26,6 +30,8 @@ out = {'movie': {}, 'tv': {}}
 for wid, era, title, date, studio, director in rows:
     m = re.match(r'(\d{4})(?:-(\d{2})(?:-(\d{2}))?)?', date or '')
     if not m:
+        continue
+    if wid in exclude:
         continue
     kind = 'movie' if era == '映画' else 'tv'
     md = (m.group(2) or '') + ('-' + m.group(3) if m.group(3) else '') if m.group(2) else ''
