@@ -8,7 +8,7 @@ AniList の API はキー不要・非営利は無料。いまは1分30回の制�
   data/anilist-unsure.json   … 迷う作品（候補つき）。確認ページで依頼者が選ぶ
   data/anilist-decisions.json… 依頼者の判断 {作品ID: AniListの作品番号 または "none"}。照合し直しても最優先で使い、消さない
 """
-import json, os, re, sys, time, unicodedata, urllib.request
+import difflib, json, os, re, sys, time, unicodedata, urllib.request
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 P = lambda *a: os.path.join(ROOT, *a)
@@ -81,7 +81,9 @@ def short(title):
     t = core(title)
     t = re.sub(r'[「」『』【】\[\]〔〕]', ' ', t)
     t = re.split(r'\s|〜|～|~|－|-|―|:|：|／|/', t.strip())[0]
-    return t[:12] if len(t) > 12 else t
+    t = t[:12] if len(t) > 12 else t
+    t2 = re.sub(r'[IVXⅠ-Ⅻ0-9０-９]+$', '', t)   # 末尾の数字・ローマ数字を外す（AniList は Ⅱ を1文字で持つため）
+    return t2 if len(t2) >= 3 else t
 
 
 MOVIE_FMT = {'MOVIE', 'SPECIAL', 'OVA'}
@@ -95,7 +97,8 @@ def judge(kind, title, year, cands):
         names = {norm(c['title']['native']), norm(c['title']['romaji'])}
         cy = (c.get('startDate') or {}).get('year')
         name_ok = nt in names or nc in names
-        part = not name_ok and any(n and (nc in n or n in nc) and min(len(n), len(nc)) >= 3 for n in names)
+        part = not name_ok and any(n and (((nc in n or n in nc) and min(len(n), len(nc)) >= 3)
+                                         or difflib.SequenceMatcher(None, nc, n).ratio() >= 0.8) for n in names)
         year_ok = cy == int(year)
         near = cy is not None and abs(cy - int(year)) <= 1
         fmt_ok = c.get('format') in (MOVIE_FMT if kind == 'movie' else TV_FMT)
