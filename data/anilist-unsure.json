@@ -3071,5 +3071,740 @@
     "cover": "nx2876-ZKFgxHQOYrUg.jpg"
    }
   ]
+ },
+ {
+  "id": "f0268",
+  "title": "ねずみのよめいり",
+  "date": "1979-07-29",
+  "cands": [
+   {
+    "aid": 109391,
+    "title": "ねずみのよめいり",
+    "format": "MOVIE",
+    "year": 1961,
+    "cover": "bx109391-R3lR84P2ZAHg.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0258",
+  "title": "宇宙海賊キャプテンハーロック アルカディア号の謎",
+  "date": "1978-07-22",
+  "cands": [
+   {
+    "aid": 1000,
+    "title": "宇宙海賊キャプテンハーロック",
+    "format": "TV",
+    "year": 1978,
+    "cover": "bx1000-Xpeob9jND2tg.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0257",
+  "title": "キャンディ♥キャンディ キャンディキャンディの夏休み",
+  "date": "1978-07-22",
+  "cands": [
+   {
+    "aid": 2802,
+    "title": "キャンディ・キャンディ キャンディの夏休み",
+    "format": "MOVIE",
+    "year": 1978,
+    "cover": "b2802-FmMzQsWuPjZM.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0121",
+  "title": "たぬきさん大当り",
+  "date": "1967-03-19",
+  "cands": [
+   {
+    "aid": 179748,
+    "title": "たぬきさん大当り",
+    "format": "MOVIE",
+    "year": 1959,
+    "cover": "b179748-q66rs849ivMx.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0082",
+  "title": "セロひきのゴーシュ",
+  "date": "1949-05",
+  "cands": [
+   {
+    "aid": 119825,
+    "title": "セロひきのゴーシュ",
+    "format": "MOVIE",
+    "year": 1963,
+    "cover": "b119825-oZL9J8teXDMD.png"
+   },
+   {
+    "aid": 119824,
+    "title": "セロひきのゴーシュ",
+    "format": "OVA",
+    "year": 1998,
+    "cover": "b119824-8VweO3Mejndu.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0072",
+  "title": "金太郎",
+  "date": "1942-11-12",
+  "cands": [
+   {
+    "aid": 10759,
+    "title": "金太郎",
+    "format": "MOVIE",
+    "year": 1918,
+    "cover": ""
+   }
+  ]
+ },
+ {
+  "id": "f0070",
+  "title": "ジャックと豆の木",
+  "date": "1941-04-24",
+  "cands": [
+   {
+    "aid": 3720,
+    "title": "ジャックと豆の木",
+    "format": "MOVIE",
+    "year": 1974,
+    "cover": "bx3720-qDbMKKeLkP7B.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0066",
+  "title": "古寺のおばけ騒動",
+  "date": "1936",
+  "cands": [
+   {
+    "aid": 5838,
+    "title": "古寺のおばけ騒動",
+    "format": "MOVIE",
+    "year": 1935,
+    "cover": "b5838-QTe07RRZylUm.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0063",
+  "title": "新説カチカチ山",
+  "date": "1935",
+  "cands": [
+   {
+    "aid": 10757,
+    "title": "新説カチカチ山",
+    "format": "MOVIE",
+    "year": 1936,
+    "cover": "10757-JdVeOvXqGWwq.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0050",
+  "title": "のらくろ二等兵 教練の卷",
+  "date": "1933-06",
+  "cands": [
+   {
+    "aid": 5871,
+    "title": "のらくろ二等兵 教練の巻",
+    "format": "MOVIE",
+    "year": 1933,
+    "cover": "5871.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0044",
+  "title": "黒ニャゴ",
+  "date": "1931-01",
+  "cands": [
+   {
+    "aid": 4398,
+    "title": "黒ニャゴ",
+    "format": "MOVIE",
+    "year": 1929,
+    "cover": "4398.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0034",
+  "title": "くじら",
+  "date": "1927-06",
+  "cands": [
+   {
+    "aid": 7528,
+    "title": "くじら",
+    "format": "MOVIE",
+    "year": 1952,
+    "cover": "bx7528-PvotBkdYqQJE.jpg"
+   }
+  ]
+ },
+ {
+  "id": "f0031",
+  "title": "舌切雀",
+  "date": "1923-02-01",
+  "cands": [
+   {
+    "aid": 10756,
+    "title": "舌切雀",
+    "format": "MOVIE",
+    "year": 1917,
+    "cover": "b10756-UVNkjEfP42xp.png"
+   }
+  ]
+ },
+ {
+  "id": "f0019",
+  "title": "浦島太郎",
+  "date": "1918-02-01",
+  "cands": [
+   {
+    "aid": 5813,
+    "title": "浦島太郎",
+    "format": "MOVIE",
+    "year": 1931,
+    "cover": "5813.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-517",
+  "title": "千歳くんはラムネ瓶のなか （第2クール）",
+  "date": "2026-10-13",
+  "cands": [
+   {
+    "aid": 180082,
+    "title": "千歳くんはラムネ瓶のなか",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx180082-IZAlf06G2VVm.png"
+   },
+   {
+    "aid": 198727,
+    "title": "千歳くんはラムネ瓶のなか 2クール",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx198727-BL0JTpg0G8tq.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-484",
+  "title": "魔法の姉妹ルルットリリィ （第2クール）",
+  "date": "2026-10-04",
+  "cands": [
+   {
+    "aid": 178749,
+    "title": "魔法の姉妹ルルットリリィ",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx178749-2TRwfr1T7jzI.jpg"
+   },
+   {
+    "aid": 209032,
+    "title": "魔法の姉妹ルルットリリィ 第2クール",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx209032-R0gP5IFdk7Vd.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-486",
+  "title": "らんま1/2 （2024年版・第3期）",
+  "date": "2026-10-04",
+  "cands": [
+   {
+    "aid": 210,
+    "title": "らんま1/2",
+    "format": "TV",
+    "year": 1989,
+    "cover": "bx210-qgahLDYT0t9b.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-461",
+  "title": "氷の城壁 （第2期）",
+  "date": "2026-10-02",
+  "cands": [
+   {
+    "aid": 186497,
+    "title": "氷の城壁",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx186497-uwPrNPphXvjP.jpg"
+   },
+   {
+    "aid": 213805,
+    "title": "氷の城壁 第2期",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx213805-Nokui3uWlIlw.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-452",
+  "title": "Re:ゼロから始める異世界生活 4th season （奪還編）",
+  "date": "2026-08-12",
+  "cands": [
+   {
+    "aid": 189046,
+    "title": "Re:ゼロから始める異世界生活 4th season",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx189046-yaHWtS5FII46.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-434",
+  "title": "鎧真伝サムライトルーパー （第2クール）",
+  "date": "2026-07-07",
+  "cands": [
+   {
+    "aid": 194318,
+    "title": "鎧真伝サムライトルーパー",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx194318-V3STmm4wutVQ.jpg"
+   },
+   {
+    "aid": 209800,
+    "title": "鎧真伝サムライトルーパー 第2クール",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx209800-v3TIdNz1AV0X.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-427",
+  "title": "北斗の拳 拳王軍ザコたちの挽歌 （第2クール）",
+  "date": "2026-07-06",
+  "cands": [
+   {
+    "aid": 198720,
+    "title": "北斗の拳 拳王軍ザコたちの挽歌",
+    "format": "TV_SHORT",
+    "year": 2026,
+    "cover": "bx198720-khTq51fpDDUZ.jpg"
+   },
+   {
+    "aid": 213506,
+    "title": "北斗の拳 拳王軍ザコたちの挽歌 第2クール",
+    "format": "TV_SHORT",
+    "year": 2026,
+    "cover": "bx213506-vr9kwJjMvXV8.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-412",
+  "title": "正反対な君と僕 （第2期）",
+  "date": "2026-07-05",
+  "cands": [
+   {
+    "aid": 184951,
+    "title": "正反対な君と僕",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx184951-s8Lg2muPBhdX.jpg"
+   },
+   {
+    "aid": 210031,
+    "title": "正反対な君と僕 第2期",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx210031-TppgcHZh46LY.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-404",
+  "title": "ヘルモード 〜やり込み好きのゲーマーは廃設定の異世界で無双する〜 （2nd Season）",
+  "date": "2026-07-04",
+  "cands": [
+   {
+    "aid": 185262,
+    "title": "ヘルモード ～やり込み好きのゲーマーは廃設定の異世界で無双する～",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx185262-95wbx3Y9hCwm.jpg"
+   },
+   {
+    "aid": 209983,
+    "title": "ヘルモード ～やり込み好きのゲーマーは廃設定の異世界で無双する～ 2nd Season",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx209983-sFOcKyqMufxb.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-386",
+  "title": "花ざかりの君たちへ （第2期）",
+  "date": "2026-07-02",
+  "cands": [
+   {
+    "aid": 177580,
+    "title": "花ざかりの君たちへ",
+    "format": "ONA",
+    "year": 2026,
+    "cover": "bx177580-ujQw6Ws3oVCi.jpg"
+   },
+   {
+    "aid": 209669,
+    "title": "花ざかりの君たちへ 第2期",
+    "format": "ONA",
+    "year": 2026,
+    "cover": "bx209669-7GlPe2ra5f1i.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-382",
+  "title": "夜桜さんちの大作戦 （第2期・第1クール）",
+  "date": "2026-04-12",
+  "cands": [
+   {
+    "aid": 182578,
+    "title": "夜桜さんちの大作戦 第2期",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx182578-Te8W0EwesgrS.jpg"
+   },
+   {
+    "aid": 213657,
+    "title": "夜桜さんちの大作戦 第2期 第2クール",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx213657-ORNXVEBCjXaz.jpg"
+   },
+   {
+    "aid": 158898,
+    "title": "夜桜さんちの大作戦",
+    "format": "TV",
+    "year": 2024,
+    "cover": "bx158898-O3egiBNkxLQO.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-374",
+  "title": "彼女、お借りします （第5期）",
+  "date": "2026-04-11",
+  "cands": [
+   {
+    "aid": 113813,
+    "title": "彼女、お借りします",
+    "format": "TV",
+    "year": 2020,
+    "cover": "bx113813-SnljeXpU3Pw7.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-369",
+  "title": "Re:ゼロから始める異世界生活 4th season （喪失編）",
+  "date": "2026-04-08",
+  "cands": [
+   {
+    "aid": 189046,
+    "title": "Re:ゼロから始める異世界生活 4th season",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx189046-yaHWtS5FII46.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-336",
+  "title": "ねずみくんのチョッキ （第1期）",
+  "date": "2026-04-04",
+  "cands": [
+   {
+    "aid": 198411,
+    "title": "ねずみくんのチョッキ (TV)",
+    "format": "TV_SHORT",
+    "year": 2026,
+    "cover": "bx198411-FuPLk3KBEoFH.png"
+   },
+   {
+    "aid": 214968,
+    "title": "ねずみくんのチョッキ (TV) 第2期",
+    "format": "TV_SHORT",
+    "year": 2026,
+    "cover": "bx214968-rrPSP2nKF40C.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-329",
+  "title": "転生したらスライムだった件 （第4期・第1 - 第2クール）",
+  "date": "2026-04-03",
+  "cands": [
+   {
+    "aid": 101280,
+    "title": "転生したらスライムだった件",
+    "format": "TV",
+    "year": 2018,
+    "cover": "bx101280-tDxCVJm714nt.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-323",
+  "title": "Dr.STONE SCIENCE FUTURE （第3クール）",
+  "date": "2026-04-02",
+  "cands": [
+   {
+    "aid": 172019,
+    "title": "Dr.STONE SCIENCE FUTURE",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx172019-3cfZbrYBmV23.jpg"
+   },
+   {
+    "aid": 199221,
+    "title": "Dr.STONE SCIENCE FUTURE 3クール",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx199221-TReDQMNhslHu.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-317",
+  "title": "最強の王様、二度目の人生は何をする? （Season2）",
+  "date": "2026-04-01",
+  "cands": [
+   {
+    "aid": 183161,
+    "title": "最強の王様、二度目の人生は 何をする?",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx183161-5M054tuPmZJX.jpg"
+   },
+   {
+    "aid": 194317,
+    "title": "最強の王様、二度目の人生は 何をする? 第2期",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx194317-M7t2ymBDHqyW.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-309",
+  "title": "闇芝居 （第16期）",
+  "date": "2026-01-12",
+  "cands": [
+   {
+    "aid": 19383,
+    "title": "闇芝居",
+    "format": "TV_SHORT",
+    "year": 2013,
+    "cover": "b19383-vmpqTraCFNRg.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-287",
+  "title": "呪術廻戦 死滅回遊 前編",
+  "date": "2026-01-09",
+  "cands": [
+   {
+    "aid": 172463,
+    "title": "呪術廻戦 死滅回游 前編",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx172463-LnXqHzt74SJL.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-288",
+  "title": "どうせ、恋してしまうんだ。 （第2期）",
+  "date": "2026-01-09",
+  "cands": [
+   {
+    "aid": 175409,
+    "title": "どうせ、恋してしまうんだ。",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx175409-ZYYEw0H6QypN.jpg"
+   },
+   {
+    "aid": 189137,
+    "title": "どうせ、恋してしまうんだ。Season 2",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx189137-cCXaEiX0bJb4.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-282",
+  "title": "Duel Masters LOST 〜月下の死神〜",
+  "date": "2026-01-08",
+  "cands": [
+   {
+    "aid": 187507,
+    "title": "Duel Masters LOST ～月下の死神～",
+    "format": "ONA",
+    "year": 2024,
+    "cover": "bx187507-QqJ6HlOm65Iy.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-251",
+  "title": "わたしが恋人になれるわけないじゃん、ムリムリ!（※ムリじゃなかった!?） （第13話 - 第17話）",
+  "date": "2026-01-01",
+  "cands": [
+   {
+    "aid": 184591,
+    "title": "わたしが恋人になれるわけないじゃん、ムリムリ! (※ムリじゃなかった!?)",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx184591-jRXZ29bN61Zc.jpg"
+   },
+   {
+    "aid": 199112,
+    "title": "わたしが恋人になれるわけないじゃん、ムリムリ! (※ムリじゃなかった!?)〜ネクストシャイン！〜",
+    "format": "TV",
+    "year": 2026,
+    "cover": "bx199112-WyGPtcAI5QZp.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-247",
+  "title": "Duel Masters LOST 〜追憶の水晶〜",
+  "date": "2025-12-11",
+  "cands": [
+   {
+    "aid": 175473,
+    "title": "Duel Masters LOST ～追憶の水晶～",
+    "format": "ONA",
+    "year": 2024,
+    "cover": "bx175473-GZVodFQ3gqJb.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-231",
+  "title": "嘆きの亡霊は引退したい （第2クール）",
+  "date": "2025-10-06",
+  "cands": [
+   {
+    "aid": 175019,
+    "title": "嘆きの亡霊は引退したい",
+    "format": "TV",
+    "year": 2024,
+    "cover": "bx175019-8lLRmHID5fMd.jpg"
+   },
+   {
+    "aid": 185801,
+    "title": "嘆きの亡霊は引退したい 2",
+    "format": "ONA",
+    "year": 2025,
+    "cover": "bx185801-HaxWxYlkFnRg.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-217",
+  "title": "ウマ娘 シンデレラグレイ （第2クール）",
+  "date": "2025-10-05",
+  "cands": [
+   {
+    "aid": 180516,
+    "title": "ウマ娘 シンデレラグレイ",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx180516-lebpoKLkw6E3.jpg"
+   },
+   {
+    "aid": 195240,
+    "title": "ウマ娘 シンデレラグレイ 第2クール",
+    "format": "TV",
+    "year": 2025,
+    "cover": "bx195240-hKcmllV6YHQT.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-225",
+  "title": "らんま1/2 （2024年版・第2期）",
+  "date": "2025-10-05",
+  "cands": [
+   {
+    "aid": 210,
+    "title": "らんま1/2",
+    "format": "TV",
+    "year": 1989,
+    "cover": "bx210-qgahLDYT0t9b.png"
+   }
+  ]
+ },
+ {
+  "id": "w25-211",
+  "title": "僕のヒーローアカデミア （FINAL SEASON）",
+  "date": "2025-10-04",
+  "cands": [
+   {
+    "aid": 21459,
+    "title": "僕のヒーローアカデミア",
+    "format": "TV",
+    "year": 2016,
+    "cover": "bx21459-nYh85uj2Fuwr.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-180",
+  "title": "SAKAMOTO DAYS （第2クール）",
+  "date": "2025-07-15",
+  "cands": [
+   {
+    "aid": 177709,
+    "title": "SAKAMOTO DAYS",
+    "format": "ONA",
+    "year": 2025,
+    "cover": "bx177709-e5Qx6RlsBgD5.png"
+   },
+   {
+    "aid": 184237,
+    "title": "SAKAMOTO DAYS 第２クール",
+    "format": "ONA",
+    "year": 2025,
+    "cover": "bx184237-OJAksU2fsIPx.jpg"
+   }
+  ]
+ },
+ {
+  "id": "w25-179",
+  "title": "闇芝居 （第15期）",
+  "date": "2025-07-14",
+  "cands": [
+   {
+    "aid": 19383,
+    "title": "闇芝居",
+    "format": "TV_SHORT",
+    "year": 2013,
+    "cover": "b19383-vmpqTraCFNRg.jpg"
+   }
+  ]
  }
 ]
