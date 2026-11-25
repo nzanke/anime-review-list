@@ -129,7 +129,12 @@ def lookup(chunk, make_query):
         out.append(judge(kind, r[1], r[2][:4], cands))
     retry = [i for i, (res, b, g) in enumerate(out) if res == 'none' and short(chunk[i][1]) != core(chunk[i][1]) and len(short(chunk[i][1])) >= 2]
     if retry:
-        d2 = gql(make_query(len(retry)), {f's{j}': short(chunk[i][1]) for j, i in enumerate(retry)})
+        # 2回目：短い題名で、公開年の前後1年に絞って15件まで見る
+        q2 = 'query { ' + ' '.join(
+            f'a{j}: Page(perPage: 15) {{ media(search: {json.dumps(short(chunk[i][1]), ensure_ascii=False)}, type: ANIME, '
+            f'startDate_greater: {int(chunk[i][2][:4]) - 1}0000, startDate_lesser: {int(chunk[i][2][:4]) + 2}0000) {{ {FIELDS} }} }}'
+            for j, i in enumerate(retry)) + ' }'
+        d2 = gql(q2, {})
         for j, i in enumerate(retry):
             r = chunk[i]
             cands = ((d2.get(f'a{j}') or {}).get('media')) or []
