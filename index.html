@@ -99,6 +99,8 @@ details[open]>summary::before{transform:rotate(45deg)}
 .work>summary .dt{color:var(--sub);font-size:13px;min-width:2.7em;flex:none}
 .info{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--sub);padding:2px 0 4px}
 .info span{display:inline-flex;align-items:center;gap:3px}
+.tag.so{border-color:var(--sub);color:var(--sub)}
+.ib.so.on{color:var(--acc);background:var(--acc-pale)}
 .tag{font-size:11px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;padding:0 4px;margin-left:4px;font-weight:400}
 .hid{opacity:.55}
 .tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
@@ -184,6 +186,7 @@ dialog .btns button.p{background:var(--acc);color:#fff}
 <symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/></symbol>
 <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
 <symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
 </svg>
 
@@ -251,6 +254,8 @@ const loadingYears=new Set();
 let pending=LS.get('arl-pending',{});
 let kind=null, editMode=false, editing=null, undoStack=[];
 let onlyRv=LS.get('arl-onlyrv',false);
+let SOSHU={};   // 総集編の作品 {作品ID:[題名,年]}（data/soshu.json）
+let showSoshu=LS.get('arl-soshu',true);
 const openSet=new Set(LS.get('arl-open',[]));
 
 /* ---------- 読み込み ---------- */
@@ -281,11 +286,11 @@ function works(k,y){
   const hide=new Set(u.hide), list=[];
   const mk=(id,title,md,studio,dir,added,cour,min)=>{
     const f=u.fix[id]||{}, s=u.w[id]||{};
-    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title,min:min||0};
+    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],orig:title,min:min||0,soshu:!!SOSHU[id]};
   };
   for(const [id,t,md,st,dr,mn] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false,null,mn));
   for(const a of u.add) list.push(mk(a.id,a.title,a.md||'','','',true,a.cour));
-  return list;
+  return showSoshu?list:list.filter(w=>!w.soshu);
 }
 function hiddenWorks(k,y){
   const key=k+'/'+y, u=UD[key]; if(!u) return [];
@@ -355,7 +360,8 @@ function setKind(k){
   if(k){ if(location.hash!=='#'+k) history.replaceState(null,'','#'+k); render(); }
   document.title=(k?KINDNAME[k]+'｜':'')+'アニメレビュー索引';
 }
-function yearCount(k,y){const u=UIDX[k][y]||{};return (CIDX[k][y]||0)+(u.a||0)-(u.h||0)}
+function soshuIn(k,y){let n=0;for(const id in SOSHU) if(SOSHU[id][1]==y&&(k==='movie'?id[0]==='f':id[0]!=='f')) n++;return n}
+function yearCount(k,y){const u=UIDX[k][y]||{};return (CIDX[k][y]||0)+(u.a||0)-(u.h||0)-(showSoshu?0:soshuIn(k,y))}
 function decades(k){
   const ys=new Set([...Object.keys(CIDX[k]),...Object.keys(UIDX[k]).filter(y=>UIDX[k][y].a)]);
   const m={};
@@ -368,7 +374,7 @@ function cntHtml(k,n,r,w){return `<span class="cnt">${r?`<span class="rc" style=
 function render(){
   if(!CIDX||!kind) return;
   const k=kind, decs=decades(k);
-  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}レビューのある作品だけ</button>`;
+  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}レビューのある作品だけ</button><button class="flt" data-act="showSoshu" aria-pressed="${showSoshu}" title="総集編・再編集版の表示を切り替える">${ic('layers')}総集編を表示</button>`;
   if(editMode&&!(editing&&editing.t==='work'&&editing.isNew&&editing.top)) h+=`<button class="add" data-act="addWork" data-top="1">${ic('plus')}台帳にない作品を追加</button>`;
   h+='</div>';
   if(editMode&&editing&&editing.t==='work'&&editing.isNew&&editing.top) h+=workForm(editing);
@@ -444,7 +450,7 @@ function worksHtml(k,y,ws){
   for(const w of ws){
     if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
     const wid='w-'+w.id;
-    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
     if(openSet.has(wid)) h+=workBody(w,y);
     h+='</details></li>';
   }
@@ -537,6 +543,12 @@ document.addEventListener('click',async ev=>{
       document.body.classList.toggle('edit',editMode); b.classList.toggle('on',editMode);
       setStatus(); render(); break;
     case 'onlyRv': onlyRv=!onlyRv; LS.set('arl-onlyrv',onlyRv); render(); break;
+    case 'showSoshu': showSoshu=!showSoshu; LS.set('arl-soshu',showSoshu); render(); break;
+    case 'soshu': {
+      if(SOSHU[c.id]) delete SOSHU[c.id]; else SOSHU[c.id]=[c.w.orig,String(c.y)];
+      pending['data/soshu.json']=JSON.stringify(SOSHU,null,1); LS.set('arl-pending',pending); scheduleSync(); render();
+      toast(SOSHU[c.id]?`「${c.w.title}」を総集編にしました`:`「${c.w.title}」の総集編の印を外しました`); break;
+    }
     case 'token': $('#tokenIn').value=CFG.token; $('#tokenDlg').showModal(); break;
     case 'tokenClose': $('#tokenDlg').close(); break;
     case 'tokenClear': CFG.token=''; LS.set('arl-cfg',CFG); $('#tokenIn').value=''; setStatus(); break;
@@ -652,7 +664,8 @@ window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);setKind
 
 /* ---------- 起動 ---------- */
 (async()=>{
-  try{[CIDX,UIDX]=await Promise.all([getFile('catalog/index.json'),getFile('data/index.json',true)])}catch(e){console.error(e)}
+  try{[CIDX,UIDX,SOSHU]=await Promise.all([getFile('catalog/index.json'),getFile('data/index.json',true),getFile('data/soshu.json',true).catch(()=>({}))])}catch(e){console.error(e)}
+  SOSHU=SOSHU||{};
   CIDX=CIDX||{movie:{},tv:{}};
   UIDX=UIDX||{}; UIDX.movie=UIDX.movie||{}; UIDX.tv=UIDX.tv||{};
   const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
