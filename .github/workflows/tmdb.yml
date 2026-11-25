@@ -1,0 +1,27 @@
+name: TMDBのポスターを照合
+on:
+  workflow_dispatch:
+    inputs:
+      args:
+        description: 'tmdb_match.py に渡す引数（--only-new で未照合の作品だけ）'
+        required: false
+        default: ''
+permissions:
+  contents: write
+jobs:
+  match:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: 照合する
+        env:
+          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+        run: python3 tools/tmdb_match.py ${{ github.event.inputs.args }}
+      - name: 結果を保存する
+        run: |
+          git config user.name nzanke
+          git config user.email nzanke@users.noreply.github.com
+          git add catalog/posters.json data/tmdb-unsure.json
+          git diff --cached --quiet || git commit -m "TMDBのポスター照合の結果を保存"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
