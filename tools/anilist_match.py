@@ -8,7 +8,7 @@ AniList の API はキー不要・非営利は無料。いまは1分30回の制�
   data/anilist-unsure.json   … 迷う作品（候補つき）。確認ページで依頼者が選ぶ
   data/anilist-decisions.json… 依頼者の判断 {作品ID: AniListの作品番号 または "none"}。照合し直しても最優先で使い、消さない
 """
-import difflib, json, os, re, sys, time, unicodedata, urllib.request
+import difflib, json, os, re, subprocess, sys, time, unicodedata, urllib.request
 
 ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')
 P = lambda *a: os.path.join(ROOT, *a)
@@ -35,9 +35,9 @@ def save(path, data, compact=False):
 last = [0.0]
 stat = {'req': 0, 'r429': 0, 'wait': 0.0}
 fails = [0]   # 続けて拒否された回数。最初から拒否が続くときは早めに止める
-def gql(query, variables):
+def gql(query, variables, cost=1):
     for i in range(8):
-        wait = 2.1 - (time.time() - last[0])   # 1分30回に収める
+        wait = 2.15 * cost - (time.time() - last[0])   # 1分30作品分に収める（まとめた作品数ぶん空ける）
         if wait > 0:
             time.sleep(wait)
         last[0] = time.time()
@@ -131,7 +131,7 @@ def cover_name(c):
 
 def lookup(chunk, make_query):
     """10作品ずつ調べる。見つからなかった作品は短い題名でもう一度まとめて調べる"""
-    data = gql(make_query(len(chunk)), {f's{i}': core(r[1]) for i, r in enumerate(chunk)})
+    data = gql(make_query(len(chunk)), {f's{i}': core(r[1]) for i, r in enumerate(chunk)}, cost=len(chunk))
     out = []
     for i, r in enumerate(chunk):
         kind = 'movie' if r[0].startswith('f') else 'tv'
@@ -144,7 +144,7 @@ def lookup(chunk, make_query):
             f'a{j}: Page(perPage: 15) {{ media(search: {json.dumps(short(chunk[i][1]), ensure_ascii=False)}, type: ANIME, '
             f'startDate_greater: {int(chunk[i][2][:4]) - 1}0000, startDate_lesser: {int(chunk[i][2][:4]) + 2}0000) {{ {FIELDS} }} }}'
             for j, i in enumerate(retry)) + ' }'
-        d2 = gql(q2, {})
+        d2 = gql(q2, {}, cost=len(retry))
         for j, i in enumerate(retry):
             r = chunk[i]
             cands = ((d2.get(f'a{j}') or {}).get('media')) or []
@@ -155,12 +155,15 @@ def lookup(chunk, make_query):
 def main():
     rows = json.load(open(P('catalog', 'search-titles.json'), encoding='utf-8'))
     decisions = load(P('data', 'anilist-decisions.json'), {})
-    only_new = '--only-new' in sys.argv
     apply_only = '--apply' in sys.argv   # 依頼者の判断を当てはめるだけ（照合はしない）
-    keep = only_new or apply_only
-    thumbs = load(P('catalog', 'thumbs.json'), {}) if keep else {}
-    match = load(P('data', 'anilist-match.json'), {}) if keep else {}
-    todo = [] if apply_only else [r for r in rows if r[0] not in decisions and r[0] not in match]
+    reset = '--reset' in sys.argv        # はじめからやり直す
+    thumbs = {} if reset else load(P('catalog', 'thumbs.json'), {})
+    match = {} if reset else load(P('data', 'anilist-match.json'), {})
+    done = set() if reset else set(load(P('data', 'anilist-done.json'), []))
+    # 映画を新しい順に先に、テレビを新しい順に後で
+    order = sorted(rows, key=lambda r: (not r[0].startswith('f'), r[2]), reverse=False)
+    order = [r for r in order if r[0].startswith('f')][::-1] + [r for r in order if not r[0].startswith('f')][::-1]
+    todo = [] if apply_only else [r for r in order if r[0] not in decisions and r[0] not in done]
     def make_query(n):
         vars_def = ', '.join(f'$s{i}: String' for i in range(n))
         body = ' '.join(f'a{i}: Page(perPage: 6) {{ media(search: $s{i}, type: ANIME) {{ {FIELDS} }} }}' for i in range(n))
@@ -185,13 +188,27 @@ def main():
         return
     print('照合する作品', len(todo), '件（依頼者の判断済み', len(decisions), '件）', flush=True)
 
-    unsure = [u for u in load(P('data', 'anilist-unsure.json'), []) if u['id'] not in decisions] if apply_only else []
+    unsure = [] if reset else [u for u in load(P('data', 'anilist-unsure.json'), []) if u['id'] not in decisions]
+    start = time.time(); last_commit = [time.time()]
+    def save_all():
+        save(P('catalog', 'thumbs.json'), dict(sorted(thumbs.items())), compact=True)
+        save(P('data', 'anilist-match.json'), dict(sorted(match.items())), compact=True)
+        save(P('data', 'anilist-unsure.json'), unsure)
+        save(P('data', 'anilist-done.json'), sorted(done), compact=True)
+    def commit(msg):
+        save_all()
+        if not os.environ.get('GITHUB_ACTIONS'):
+            return
+        subprocess.run('git add catalog/thumbs.json data/anilist-*.json && (git diff --cached --quiet || git commit -q -m "' + msg + '") '
+                       '&& for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done', shell=True)
+        last_commit[0] = time.time()
     for b in range(0, len(todo), BATCH):
         chunk = todo[b:b + BATCH]
         results = lookup(chunk, make_query)
         for i, r in enumerate(chunk):
             wid, title, date = r[0], r[1], r[2]
             res, best, good = results[i]
+            done.add(wid)
             if res == 'sure':
                 match[wid] = best['id']
                 n = cover_name(best)
@@ -204,7 +221,12 @@ def main():
                                           'cover': cover_name(c)} for c in good]})
         if (b // BATCH) % 50 == 0:
             print(b + len(chunk), '/', len(todo), '件済み　結び付いた', len(match), '迷う', len(unsure), flush=True)
-            save(P('catalog', 'thumbs.json'), dict(sorted(thumbs.items())), compact=True)
+        if time.time() - last_commit[0] > 1800:
+            commit(f'AniListの表紙画像の照合（途中経過：{len(done)}件まで）')
+        if time.time() - start > 4.5 * 3600:
+            print('時間の区切りに来たので、ここまでを保存して次の回に回します', flush=True)
+            open(P('.anilist-more'), 'w').write('1')
+            break
 
     # 依頼者の判断を反映（選んだ作品の表紙を取り直す）
     picked = [(w, a) for w, a in decisions.items() if a != 'none']
@@ -214,16 +236,14 @@ def main():
     for b in range(0, len(picked), BATCH):
         chunk = picked[b:b + BATCH]
         q = 'query { ' + ' '.join(f'a{i}: Media(id: {int(a)}) {{ {FIELDS} }}' for i, (w, a) in enumerate(chunk)) + ' }'
-        data = gql(q, {})
+        data = gql(q, {}, cost=len(chunk))
         for i, (w, a) in enumerate(chunk):
             match[w] = int(a)
             n = cover_name(data.get(f'a{i}'))
             if n:
                 thumbs[w] = n
 
-    save(P('catalog', 'thumbs.json'), dict(sorted(thumbs.items())), compact=True)
-    save(P('data', 'anilist-match.json'), dict(sorted(match.items())), compact=True)
-    save(P('data', 'anilist-unsure.json'), unsure)
+    save_all()
     print('結び付いた', len(match), '表紙あり', len(thumbs), '迷う', len(unsure), flush=True)
 
 

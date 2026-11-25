@@ -14,12 +14,17 @@ concurrency:
   cancel-in-progress: false
 permissions:
   contents: write
+  actions: write
 jobs:
   match:
     runs-on: ubuntu-latest
     timeout-minutes: 300
     steps:
       - uses: actions/checkout@v4
+      - name: 名前を設定する
+        run: |
+          git config user.name nzanke
+          git config user.email nzanke@users.noreply.github.com
       - name: 照合する
         run: python3 tools/anilist_match.py ${{ github.event_name == 'push' && '--apply' || github.event.inputs.args }}
       - name: 結果を保存する
@@ -30,3 +35,8 @@ jobs:
           git add catalog/thumbs.json data/anilist-*.json 2>/dev/null || true
           git diff --cached --quiet || git commit -m "AniListの表紙画像の照合結果を保存"
           for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
+      - name: 残りがあれば次の回を始める
+        if: ${{ always() && hashFiles('.anilist-more') != '' }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh workflow run anilist.yml --ref main
