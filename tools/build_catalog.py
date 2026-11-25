@@ -50,6 +50,16 @@ for kind, years in out.items():
         with open(os.path.join(root, kind, y + '.json'), 'w', encoding='utf-8') as f:
             json.dump(ws, f, ensure_ascii=False, separators=(',', ':'))
         index[kind][y] = len(ws)
+# 閲覧ページの検索用：作品名の索引と、監督・スタジオの索引を分けて書く（必要なときだけ読む）
+titles, staff = [], []
+for kind, years in out.items():
+    for y, ws in sorted(years.items()):
+        for w in ws:
+            titles.append([w[0], w[1], y + ('-' + w[2] if w[2] else ''), w[5] if len(w) > 5 else 0])
+            staff.append([w[0], w[4], w[3]])
+for name, data in (('search-titles.json', titles), ('search-staff.json', staff)):
+    with open(os.path.join(root, name), 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
 with open(os.path.join(root, 'index.json'), 'w', encoding='utf-8') as f:
     json.dump(index, f, ensure_ascii=False, separators=(',', ':'))
 print('上映時間あり', len(minutes)); print({k: (len(v), sum(v.values())) for k, v in index.items()})

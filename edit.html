@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>編集｜アニメレビュー索引</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&display=swap" rel="stylesheet">
+<style>
+@font-face{font-family:"UD英数";src:url(lib/fonts/biz-udgothic-latin-400-normal.woff2) format("woff2");font-weight:400;font-display:swap;unicode-range:U+0020-007E,U+00A0-00FF}
+@font-face{font-family:"UD英数";src:url(lib/fonts/biz-udgothic-latin-700-normal.woff2) format("woff2");font-weight:700;font-display:swap;unicode-range:U+0020-007E,U+00A0-00FF}
+:root{
+  --ui:"UD英数","BIZ UDPGothic","Hiragino Sans",system-ui,sans-serif;
+  /* 色：無彩色寄りの青灰を土台に、映画＝藍(230)・テレビ＝青緑(170)を同じトーン(彩度45%・明度34%)でそろえ、受賞だけ黄土(42)を差し色に */
+  --ink:hsl(222 24% 18%);
+  --sub:hsl(222 10% 46%);
+  --line:hsl(222 16% 88%);
+  --bg:hsl(222 20% 98%);
+  --card:#fff;
+  --movie:hsl(230 45% 38%);--movie-pale:hsl(230 45% 95%);
+  --tv:hsl(170 45% 28%);--tv-pale:hsl(170 35% 94%);
+  --gold:hsl(42 60% 36%);--gold-pale:hsl(42 70% 94%);
+  --warn:hsl(4 55% 44%);
+  --acc:var(--movie);--acc-pale:var(--movie-pale);
+}
+body.k-tv{--acc:var(--tv);--acc-pale:var(--tv-pale)}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:var(--ui);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.6}
+button,input,select{font-family:inherit;font-size:14px;color:inherit}
+a{color:inherit;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--acc)}
+svg.i{width:1em;height:1em;vertical-align:-.13em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+header{background:var(--card);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header .wrap{display:flex;align-items:center;gap:8px;height:50px}
+header h1{font-size:16px;margin:0;font-weight:700;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+header h1 a{text-decoration:none}
+.tabs{display:flex;gap:4px}
+.tab{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:4px 10px;cursor:pointer;display:flex;align-items:center;gap:5px}
+.tab[aria-pressed=true]{background:var(--acc);border-color:var(--acc);color:#fff}
+.ib{border:0;background:none;cursor:pointer;padding:5px;border-radius:6px;color:var(--sub);line-height:1;display:inline-flex;align-items:center;gap:4px}
+.ib:hover{background:var(--acc-pale);color:var(--acc)}
+.ib.on{background:var(--acc);color:#fff}
+.ib.del:hover{background:hsl(4 60% 95%);color:var(--warn)}
+#status{font-size:12px;color:var(--sub);display:none;align-items:center;gap:3px;white-space:nowrap}
+body.edit #status{display:inline-flex}
+#status.ng{color:var(--warn)}
+.editbar{display:none;background:var(--acc-pale);color:var(--acc);font-size:13px;padding:6px 0}
+body.edit .editbar{display:block}
+.editbar .wrap{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* トップ */
+#home{padding:40px 0}
+#home p{color:var(--sub);text-align:center;margin:0 0 20px}
+.choice{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.choice button{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:26px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:17px;font-weight:700}
+.choice button svg{width:38px;height:38px;stroke-width:1.6}
+.choice .m{color:var(--movie)}.choice .m:hover{background:var(--movie-pale)}
+.choice .t{color:var(--tv)}.choice .t:hover{background:var(--tv-pale)}
+.choice small{font-weight:400;color:var(--sub);font-size:13px}
+/* リスト */
+#list{padding:14px 0 80px}
+details>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--sub);border-bottom:2px solid var(--sub);transform:rotate(-45deg);flex:none;margin:0 4px 0 2px;transition:transform .12s}
+details[open]>summary::before{transform:rotate(45deg)}
+.dec{border-bottom:1px solid var(--line)}
+.dec{scroll-margin-top:56px}
+.dec>summary{font-weight:700;font-size:17px;padding:10px 2px;color:var(--acc)}
+.cnt{margin-left:auto;font-size:12px;color:var(--sub);font-weight:400;display:inline-flex;align-items:center;gap:3px}
+.yr{margin-left:12px;border-top:1px solid var(--line)}
+.yr>summary{padding:8px 2px;font-weight:700}
+.cour{margin-left:14px}
+.cour>summary{padding:6px 2px;font-weight:700;color:var(--acc);font-size:14px}
+.cour>summary .months{color:var(--sub);font-weight:400;font-size:12px}
+.works{margin:0 0 8px 14px;padding:0;list-style:none}
+.work{background:var(--card);border:1px solid var(--line);border-radius:8px;margin:5px 0}
+.work>summary{padding:7px 8px;gap:6px}
+.work>summary .t{flex:1;min-width:0}
+/* PCは作品名と同じ行に監督・スタジオ（入りきらない分は監督・スタジオの側から縮めて…で切る）。スマホでは出さない */
+.work>summary .t{display:flex;align-items:baseline;gap:14px}
+.work>summary .tt{font-weight:700;flex:0 1 auto;min-width:0}
+.work>summary .sub{flex:0 1000 auto;display:flex;gap:10px;font-size:12px;font-weight:400;color:var(--sub);min-width:0;white-space:nowrap;overflow:hidden}
+.work>summary .sub>span{display:inline-flex;align-items:center;gap:3px;min-width:0;overflow:hidden;text-overflow:ellipsis}
+.work>summary .sub .sd{flex:0 0 auto;max-width:65%}
+.work>summary .sub .ss{flex:0 1 auto;padding-left:10px;border-left:1px solid var(--line)}
+.work>summary .sub .sd:only-child,.work>summary .sub .ss:first-child{padding-left:0;border-left:0}
+.work>summary .sub svg.i{opacity:.7}
+
+.work[open]>summary{border-bottom:1px solid var(--line)}
+.meta{display:inline-flex;gap:8px;font-size:12px;color:var(--sub);white-space:nowrap}
+.meta .aw{color:var(--gold)}
+/* 長・中・短：同じ色相で濃淡をつける（長＝塗り、中＝淡い塗り、短＝線だけ） */
+.len{flex:none;display:inline-flex;align-items:center;justify-content:center;width:1.55em;height:1.55em;border-radius:4px;font-size:11px;font-weight:700;border:1px solid var(--acc);color:var(--acc);line-height:1}
+.len.l長{background:var(--acc);color:#fff}
+.len.l中{background:var(--acc-pale)}
+.len.none{border-color:transparent}
+.meta .rc{color:var(--acc);font-weight:700}
+.work>summary .dt{color:var(--sub);font-size:13px;min-width:2.7em;flex:none}
+.info{display:flex;flex-wrap:wrap;gap:2px 12px;font-size:13px;color:var(--sub);padding:2px 0 4px}
+.info span{display:inline-flex;align-items:center;gap:3px}
+.ndl{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:var(--sub);border:1px solid var(--line);border-radius:4px;padding:0 4px;white-space:nowrap}
+.tag.so{border-color:var(--sub);color:var(--sub)}
+.ib.so.on{color:var(--acc);background:var(--acc-pale)}
+.tag{font-size:11px;border:1px solid var(--acc);color:var(--acc);border-radius:4px;padding:0 4px;margin-left:4px;font-weight:400}
+.hid{opacity:.55}
+.tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.flt{border:1px solid var(--line);background:var(--card);border-radius:6px;padding:4px 10px;cursor:pointer;display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--sub)}
+.flt[aria-pressed=true]{border-color:var(--acc);color:var(--acc);background:var(--acc-pale)}
+.wbody{padding:6px 10px 8px}
+.wbody h3{font-size:12px;color:var(--sub);margin:6px 0 2px;display:flex;align-items:center;gap:4px;font-weight:700}
+.wbody ul{list-style:none;margin:0;padding:0}
+.rv,.awl{padding:5px 0;border-bottom:1px dashed var(--line);display:flex;gap:6px;align-items:flex-start}
+.rv:last-child,.awl:last-child{border-bottom:0}
+.rv .txt,.awl .txt{flex:1;min-width:0}
+.rv .ti{font-weight:700}
+.rv .src,.rv .au,.rv .y{white-space:nowrap}
+.rv .ico,.awl .ico{color:var(--sub);margin-right:2px}
+.rv .y,.awl .y{color:var(--sub);font-size:13px}
+.awl .ico{color:var(--gold)}
+.awl .prize{color:var(--gold);font-weight:700}
+.ops{display:none;flex:none}
+body.edit .ops{display:inline-flex}
+.empty{color:var(--sub);font-size:13px;padding:4px 0}
+.add{display:none;border:1px dashed var(--acc);color:var(--acc);background:none;border-radius:6px;padding:3px 10px;cursor:pointer;font-size:13px;margin:4px 0;align-items:center;gap:4px}
+body.edit .add{display:inline-flex}
+.add:hover{background:var(--acc-pale)}
+.loading{color:var(--sub);font-size:13px;padding:6px 14px}
+.notice{color:var(--sub);text-align:center;padding:30px 0}
+/* フォーム */
+form.f{background:var(--acc-pale);border:1px solid var(--acc);border-radius:8px;padding:10px;margin:6px 0;display:grid;gap:7px}
+form.f label{display:grid;grid-template-columns:5.5em 1fr;align-items:center;gap:6px;font-size:13px}
+form.f input[type=text],form.f input[type=number],form.f input[type=url],form.f select{width:100%;padding:6px 7px;border:1px solid var(--line);border-radius:5px;background:#fff}
+form.f .seg{display:flex;gap:4px}
+form.f .lb{display:inline-flex;align-items:center;gap:3px;min-width:0}
+form.f .seg{flex-wrap:wrap}
+form.f .seg label{white-space:nowrap;font-size:13px;display:flex;gap:4px;border:1px solid var(--line);background:#fff;border-radius:5px;padding:4px 10px;cursor:pointer}
+form.f .seg input{margin:0}
+form.f .metast{font-size:12px;color:var(--acc);margin:-3px 0 0 5.5em}
+form.f .btns{display:flex;gap:6px;justify-content:flex-end}
+form.f .btns button{border:1px solid var(--acc);border-radius:6px;padding:5px 14px;cursor:pointer;background:#fff;color:var(--acc);display:inline-flex;align-items:center;gap:4px}
+form.f .btns button[type=submit]{background:var(--acc);color:#fff}
+/* トースト */
+#toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:#fff;border-radius:8px;padding:8px 10px 8px 14px;display:none;align-items:center;gap:10px;font-size:14px;z-index:20;max-width:92vw}
+#toast.show{display:flex}
+#toast button{white-space:nowrap;flex:none;background:none;border:1px solid #fff6;color:#fff;border-radius:5px;padding:3px 8px;cursor:pointer;display:inline-flex;gap:4px;align-items:center}
+dialog{border:1px solid var(--line);border-radius:10px;max-width:520px;width:92vw;font-size:14px}
+dialog h2{font-size:16px;margin:0 0 8px}
+dialog ol{padding-left:1.3em;margin:6px 0 10px}
+dialog input{width:100%;padding:7px;border:1px solid var(--line);border-radius:5px}
+dialog .btns{display:flex;gap:6px;justify-content:flex-end;margin-top:10px}
+dialog .btns button{border:1px solid var(--acc);border-radius:6px;padding:5px 14px;cursor:pointer;background:#fff;color:var(--acc)}
+dialog .btns button.p{background:var(--acc);color:#fff}
+[hidden]{display:none!important}
+@media (min-width:641px){
+  .wrap{max-width:980px}
+  .work>summary .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .work>summary .sub .sd{flex:0 1 auto;max-width:none}
+}
+@media (max-width:640px){
+  .work>summary .sub{display:none}
+}
+@media (max-width:480px){
+  header h1{font-size:14px}
+  header .wrap{gap:4px}
+  .tab span{display:none}
+  form.f label{grid-template-columns:4.8em 1fr}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+<symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M14 6l4 4"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-film" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/></symbol>
+<symbol id="i-tv" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 3l4 4 4-4"/></symbol>
+<symbol id="i-person" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19V5a2 2 0 0 1 2-2h14v14H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h14"/></symbol>
+<symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3.5 3.5 3.5 14.5 0 18M12 3c-3.5 3.5-3.5 14.5 0 18"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H4a3 3 0 0 0 4 4M16 6h4a3 3 0 0 1-4 4M12 13v4M8 21h8M10 17h4v4h-4z"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3h9l4 4v14H6z"/><path d="M9 12h7M9 16h7M9 8h3"/></symbol>
+<symbol id="i-key" viewBox="0 0 24 24"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3"/></symbol>
+<symbol id="i-cloud" viewBox="0 0 24 24"><path d="M7 18a5 5 0 0 1-.5-10A6 6 0 0 1 18 9a4.5 4.5 0 0 1-1 9z"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14L4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+<symbol id="i-studio" viewBox="0 0 24 24"><path d="M4 21V9l5 3V9l5 3V5h6v16z"/><path d="M8 17h2M14 17h2"/></symbol>
+<symbol id="i-mega" viewBox="0 0 24 24"><path d="M3 10v4h4l8 5V5L7 10z"/><path d="M18 9a4 4 0 0 1 0 6"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-layers" viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5z"/><path d="M3 13l9 5 9-5"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></symbol>
+<symbol id="i-lib" viewBox="0 0 24 24"><path d="M3 9l9-5 9 5M5 9v9M9.5 9v9M14.5 9v9M19 9v9M3 20h18"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9M18 14v6H4V6h6"/></symbol>
+</svg>
+
+<header><div class="wrap">
+  <h1><a href="./edit.html">アニメレビュー索引<small style="font-weight:400;color:var(--sub);font-size:12px">　編集</small></a></h1>
+  <div class="tabs" id="tabs" hidden>
+    <button class="tab" data-act="kind" data-k="movie"><svg class="i"><use href="#i-film"/></svg><span>映画</span></button>
+    <button class="tab" data-act="kind" data-k="tv"><svg class="i"><use href="#i-tv"/></svg><span>テレビ</span></button>
+  </div>
+  <span id="status"></span>
+  <a class="ib" href="./" title="閲覧ページへ"><svg class="i"><use href="#i-eye"/></svg></a>
+  <button class="ib" id="editBtn" data-act="edit" title="編集モード"><svg class="i"><use href="#i-pen"/></svg></button>
+</div></header>
+<div class="editbar"><div class="wrap">
+  <svg class="i"><use href="#i-pen"/></svg>編集モード（削除は確認なしで即反映、直後なら元に戻せます）
+  <button class="ib" data-act="token" title="保存の設定"><svg class="i"><use href="#i-key"/></svg>保存の設定</button>
+</div></div>
+
+<main class="wrap">
+  <section id="home">
+    <p>見たい種類を選んでください（作品はアニメデータベースの台帳から）</p>
+    <div class="choice">
+      <button class="m" data-act="kind" data-k="movie"><svg class="i"><use href="#i-film"/></svg>アニメ映画<small>年ごと・<span id="nMovie"></span>本</small></button>
+      <button class="t" data-act="kind" data-k="tv"><svg class="i"><use href="#i-tv"/></svg>テレビアニメ<small>年・クールごと・<span id="nTv"></span>作品</small></button>
+    </div>
+  </section>
+  <section id="list" hidden></section>
+</main>
+
+<div id="toast"><span id="toastMsg"></span><button data-act="undo"><svg class="i"><use href="#i-undo"/></svg>元に戻す</button></div>
+
+<dialog id="tokenDlg">
+  <h2>保存の設定</h2>
+  <div>ページ上の編集を GitHub のリポジトリへ保存するための鍵（トークン）を、このブラウザにだけ記録します。</div>
+  <ol>
+    <li><a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub の Fine-grained token 作成ページ</a>を開く</li>
+    <li>Token name は「レビュー索引」など。Repository access で「Only select repositories」→ anime-review-list を選ぶ</li>
+    <li>Permissions の Contents を「Read and write」にして作成し、出てきた文字列を下に貼る</li>
+  </ol>
+  <input id="tokenIn" type="password" placeholder="github_pat_…" autocomplete="off">
+  <div class="btns"><button data-act="tokenClear">消す</button><button data-act="tokenClose">閉じる</button><button class="p" data-act="tokenSave">保存</button></div>
+</dialog>
+
+<script>
+'use strict';
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const OWNER=(location.hostname.endsWith('.github.io')?location.hostname.split('.')[0]:'')||'nzanke';
+const REPO=(location.hostname.endsWith('.github.io')&&location.pathname.split('/')[1])||'anime-review-list';
+const API=`https://api.github.com/repos/${OWNER}/${REPO}`;
+const COURS=[['冬','1〜3月'],['春','4〜6月'],['夏','7〜9月'],['秋','10〜12月']];
+const KINDNAME={movie:'映画',tv:'テレビアニメ'};
+const coll=new Intl.Collator('ja');
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const ic=n=>`<svg class="i"><use href="#i-${n}"/></svg>`;
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+// 放送開始月からクール。3・6・9月の25日以降の開始は、次のクールの先行放送とみなす
+const courOf=md=>{let m=parseInt(md,10),d=parseInt((md||'').split('-')[1],10)||0;if(!m)return '冬';if(m%3===0&&m<12&&d>=25)m++;return COURS[Math.floor((m-1)/3)][0]};
+
+let CFG=LS.get('arl-cfg',{token:''});
+let CIDX=null;   // 台帳の索引 {movie:{年:作品数}, tv:{…}}
+let UIDX=null;   // 編集の索引 {movie:{年:{a:追加数,h:外した数,r:レビュー数,w:受賞数}}, tv:{…}}
+const CAT={};    // "tv/2016" -> 台帳の作品 [[id,題名,月日,制作,監督],…]
+const UD={};     // "tv/2016" -> 編集データ {w:{id:{rv:[],aw:[]}}, add:[], hide:[], fix:{}}
+const loadingYears=new Set();
+let pending=LS.get('arl-pending',{});
+let kind=null, editMode=false, editing=null, undoStack=[];
+let onlyRv=LS.get('arl-onlyrv',false);
+let HAS={};    // 記事のある作品と追加した作品 {作品ID:[種類,年,レビュー数,資料数,受賞数,(追加作品の題名)]}（閲覧ページの検索用）
+let SOSHU={};   // 総集編の作品 {作品ID:[題名,年]}（data/soshu.json）
+let showSoshu=LS.get('arl-soshu',true);
+const openSet=new Set(LS.get('arl-open',[]));
+for(const k of ['movie','tv']){const ds=[...openSet].filter(x=>x.startsWith(k+'-d'));ds.slice(0,-1).forEach(x=>openSet.delete(x))}
+
+/* ---------- 読み込み ---------- */
+async function getFile(path,fresh){
+  if(path in pending) return pending[path]==null?null:JSON.parse(pending[path]);
+  let r;
+  if(fresh&&CFG.token) r=await fetch(`${API}/contents/${path}?t=${Date.now()}`,{headers:{Authorization:'Bearer '+CFG.token,Accept:'application/vnd.github.raw+json'},cache:'no-store'});
+  else r=await fetch(path,{cache:'no-cache'});
+  if(r.status===404) return null;
+  if(!r.ok) throw new Error('読み込み失敗 '+r.status);
+  return r.json();
+}
+const uPath=(k,y)=>`data/${k}/${y}.json`;
+const emptyUD=()=>({w:{},add:[],hide:[],fix:{}});
+async function ensureYear(k,y){
+  const key=k+'/'+y;
+  if(CAT[key]&&UD[key]) return;
+  const [c,u]=await Promise.all([
+    CAT[key]||(CIDX[k][y]?getFile(`catalog/${k}/${y}.json`):[]),
+    UD[key]||(UIDX[k][y]?getFile(uPath(k,y),true):null)]);
+  CAT[key]=c||[]; UD[key]=Object.assign(emptyUD(),u||{});
+}
+function ud(k,y){return UD[k+'/'+y]}
+function slot(k,y,id){const u=ud(k,y);const s=u.w[id]=u.w[id]||{rv:[],aw:[]};s.iv=s.iv||[];s.sr=s.sr||[];return s}
+/* 台帳と編集を合わせた作品の一覧 */
+function works(k,y){
+  const key=k+'/'+y, u=UD[key]; if(!u||!CAT[key]) return [];
+  const hide=new Set(u.hide), list=[];
+  const mk=(id,title,md,studio,dir,added,cour,min)=>{
+    const f=u.fix[id]||{}, s=u.w[id]||{};
+    return {id,title:f.title||title,md,studio,dir,added,cour:k==='tv'?(f.cour||cour||courOf(md)):null,rv:s.rv||[],aw:s.aw||[],iv:s.iv||[],sr:s.sr||[],orig:title,min:min||0,soshu:!!SOSHU[id]};
+  };
+  for(const [id,t,md,st,dr,mn] of CAT[key]) if(!hide.has(id)) list.push(mk(id,t,md,st,dr,false,null,mn));
+  for(const a of u.add) list.push(mk(a.id,a.title,a.md||'','','',true,a.cour));
+  return showSoshu?list:list.filter(w=>!w.soshu);
+}
+function hiddenWorks(k,y){
+  const key=k+'/'+y, u=UD[key]; if(!u) return [];
+  const hide=new Set(u.hide);
+  return CAT[key].filter(w=>hide.has(w[0]));
+}
+
+/* ---------- 保存 ---------- */
+let syncTimer=null, syncing=false;
+function markDirty(k,y){
+  const u=ud(k,y);
+  for(const id in u.w){const x=u.w[id];for(const t of ['iv','sr']) if(x[t]&&!x[t].length) delete x[t];if(!x.rv.length&&!x.aw.length&&!(x.iv||[]).length&&!(x.sr||[]).length) delete u.w[id]}
+  for(const id in u.fix){if(!u.fix[id].title&&!u.fix[id].cour) delete u.fix[id]}
+  let r=0,a=0,iv=0,sr=0; for(const id in u.w){r+=u.w[id].rv.length;a+=u.w[id].aw.length;iv+=(u.w[id].iv||[]).length;sr+=(u.w[id].sr||[]).length}
+  const empty=!u.add.length&&!u.hide.length&&!Object.keys(u.w).length&&!Object.keys(u.fix).length;
+  if(empty){delete UIDX[k][y];pending[uPath(k,y)]=null}
+  else{UIDX[k][y]={a:u.add.length,h:u.hide.length,r,w:a,i:iv,s:sr};pending[uPath(k,y)]=JSON.stringify(u,null,1)}
+  for(const id in HAS) if(HAS[id][0]===k&&HAS[id][1]==y) delete HAS[id];
+  for(const id in u.w){const x=u.w[id],c=[x.rv.length,(x.sr||[]).length,x.aw.length];if(c[0]+c[1]+c[2]) HAS[id]=[k,String(y),...c]}
+  for(const a of u.add){const x=u.w[a.id]||{};HAS[a.id]=[k,String(y),(x.rv||[]).length,(x.sr||[]).length,(x.aw||[]).length,a.title]}
+  const hs={};Object.keys(HAS).sort().forEach(i=>hs[i]=HAS[i]);HAS=hs;
+  pending['data/has.json']=JSON.stringify(HAS);
+  pending['data/index.json']=JSON.stringify(UIDX,null,1);
+  LS.set('arl-pending',pending);
+  scheduleSync();
+}
+function scheduleSync(){setStatus();clearTimeout(syncTimer);if(CFG.token) syncTimer=setTimeout(sync,1500)}
+async function gh(method,path,body){
+  const r=await fetch(API+path,{method,headers:{Authorization:'Bearer '+CFG.token,Accept:'application/vnd.github+json','Content-Type':'application/json'},body:body?JSON.stringify(body):undefined,cache:'no-store'});
+  if(!r.ok) throw new Error(method+' '+path.split('/').slice(0,3).join('/')+' '+r.status);
+  return r.json();
+}
+async function sync(){
+  if(syncing){scheduleSync();return}
+  const snap={...pending};
+  if(!Object.keys(snap).length){setStatus();return}
+  syncing=true;setStatus('保存中…');
+  try{
+    const ref=await gh('GET','/git/ref/heads/main');
+    const base=await gh('GET','/git/commits/'+ref.object.sha);
+    // 消す指示は、実在するファイルだけに絞る
+    const dels=Object.entries(snap).filter(([,c])=>c==null).map(([p])=>p);
+    let exist=new Set();
+    if(dels.length){const t=await gh('GET','/git/trees/'+base.tree.sha+'?recursive=1');exist=new Set(t.tree.map(x=>x.path))}
+    const entries=Object.entries(snap).filter(([p,c])=>c!=null||exist.has(p))
+      .map(([path,c])=>c==null?{path,mode:'100644',type:'blob',sha:null}:{path,mode:'100644',type:'blob',content:c+'\n'});
+    if(entries.length){
+      const tree=await gh('POST','/git/trees',{base_tree:base.tree.sha,tree:entries});
+      const cm=await gh('POST','/git/commits',{message:'ページ上の編集を保存',tree:tree.sha,parents:[ref.object.sha]});
+      await gh('PATCH','/git/refs/heads/main',{sha:cm.sha});
+    }
+    for(const [p,c] of Object.entries(snap)) if(pending[p]===c) delete pending[p];
+    LS.set('arl-pending',pending);
+    syncing=false;setStatus();
+    if(Object.keys(pending).length) scheduleSync();
+  }catch(e){syncing=false;setStatus('保存失敗：'+e.message,true);console.error(e)}
+}
+function setStatus(msg,ng){
+  const s=$('#status'), n=Object.keys(pending).length;
+  s.classList.toggle('ng',!!ng||(!CFG.token&&n>0));
+  if(!msg) msg=!CFG.token?(n?'未保存':'保存未設定'):(n?'保存待ち':'保存済み');
+  s.title=ng?msg:(CFG.token?msg:'保存の設定（鍵）が未設定のため、編集はこのブラウザにだけ記録されています');
+  s.innerHTML=ic(n?'cloud':'check')+esc(ng?'保存失敗':msg);
+}
+
+/* ---------- 表示 ---------- */
+function setKind(k){
+  kind=k;
+  document.body.classList.toggle('k-tv',k==='tv');
+  $('#home').hidden=!!k; $('#list').hidden=!k; $('#tabs').hidden=!k;
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===k));
+  if(k){ if(location.hash!=='#'+k) history.replaceState(null,'','#'+k); render(); }
+  document.title=(k?KINDNAME[k]+'｜':'')+'編集｜アニメレビュー索引';
+}
+function soshuIn(k,y){let n=0;for(const id in SOSHU) if(SOSHU[id][1]==y&&(k==='movie'?id[0]==='f':id[0]!=='f')) n++;return n}
+function yearCount(k,y){const u=UIDX[k][y]||{};return (CIDX[k][y]||0)+(u.a||0)-(u.h||0)-(showSoshu?0:soshuIn(k,y))}
+function decades(k){
+  const ys=new Set([...Object.keys(CIDX[k]),...Object.keys(UIDX[k]).filter(y=>UIDX[k][y].a)]);
+  const m={};
+  for(const y of ys){if(onlyRv&&!(UIDX[k][y]||{}).r&&!(UIDX[k][y]||{}).w&&!(UIDX[k][y]||{}).i&&!(UIDX[k][y]||{}).s) continue;const d=Math.floor(y/10)*10;(m[d]=m[d]||[]).push(+y)}
+  return Object.entries(m).map(([d,ys])=>[+d,ys.sort((a,b)=>b-a)]).sort((a,b)=>b[0]-a[0]);
+}
+const op=id=>openSet.has(id)?' open':'';
+const kIcon=k=>ic(k==='tv'?'tv':'film');
+function cntHtml(k,n,r,w,i,sr){return `<span class="cnt">${r?`<span class="rc" style="color:var(--acc);font-weight:700">${ic('doc')}${r}</span>`:''}${i?`<span style="color:var(--acc);font-weight:700">${ic('mic')}${i}</span>`:''}${sr?`<span style="color:var(--acc);font-weight:700">${ic('lib')}${sr}</span>`:''}${w?`<span style="color:var(--gold)">${ic('trophy')}${w}</span>`:''}${n==null?'':kIcon(k)+n}</span>`}
+function render(){
+  if(!CIDX||!kind) return;
+  const k=kind, decs=decades(k);
+  let h=`<div class="tools"><button class="flt" data-act="onlyRv" aria-pressed="${onlyRv}">${ic('doc')}記事のある作品だけ</button><button class="flt" data-act="showSoshu" aria-pressed="${showSoshu}" title="総集編・再編集版の表示を切り替える">${ic('layers')}総集編を表示</button>`;
+  if(editMode&&!(editing&&editing.t==='work'&&editing.isNew&&editing.top)) h+=`<button class="add" data-act="addWork" data-top="1">${ic('plus')}台帳にない作品を追加</button>`;
+  h+='</div>';
+  if(editMode&&editing&&editing.t==='work'&&editing.isNew&&editing.top) h+=workForm(editing);
+  if(!decs.length) h+=`<div class="notice">${onlyRv?'レビューのある作品はまだありません。':'作品がありません。'}</div>`;
+  for(const [d,ys] of decs){
+    let n=0,r=0,w=0,iv=0,sr=0; for(const y of ys){n+=yearCount(k,y);r+=(UIDX[k][y]||{}).r||0;w+=(UIDX[k][y]||{}).w||0;iv+=(UIDX[k][y]||{}).i||0;sr+=(UIDX[k][y]||{}).s||0}
+    const did=`${k}-d${d}`;
+    h+=`<details class="dec" data-id="${did}"${op(did)}><summary>${d}年代${cntHtml(k,onlyRv?null:n,r,w,iv,sr)}</summary>`;
+    if(openSet.has(did)) for(const y of ys){
+      const yid=`${k}-y${y}`, key=k+'/'+y, u=UIDX[k][y]||{};
+      h+=`<details class="yr" data-id="${yid}" data-y="${y}"${op(yid)}><summary>${y}年${cntHtml(k,onlyRv?null:yearCount(k,y),u.r,u.w,u.i,u.s)}</summary>`;
+      if(openSet.has(yid)) h+= CAT[key]&&UD[key]?yearBody(k,y):'<div class="loading">読み込み中…</div>';
+      h+='</details>';
+    }
+    h+='</details>';
+  }
+  $('#list').innerHTML=h;
+  for(const id of openSet){const m=id.match(/^(movie|tv)-y(\d+)$/); if(m&&m[1]===k&&openSet.has(`${k}-d${Math.floor(m[2]/10)*10}`)&&!(CAT[k+'/'+m[2]]&&UD[k+'/'+m[2]])) loadYear(k,m[2])}
+  for(const lb of document.querySelectorAll('#list form.f label')){
+    if(lb.closest('.seg')||lb.querySelector(':scope>.lb')) continue;
+    const sp=document.createElement('span'); sp.className='lb';
+    while(lb.firstChild&&!(lb.firstChild.nodeType===1&&/^(INPUT|SELECT)$/.test(lb.firstChild.tagName))) sp.appendChild(lb.firstChild);
+    lb.prepend(sp);
+  }
+  const f=$('#list form.f input[type=text]'); if(f&&document.activeElement.tagName!=='INPUT') f.focus();
+}
+async function loadYear(k,y){
+  const key=k+'/'+y; if(loadingYears.has(key)) return;
+  loadingYears.add(key);
+  try{await ensureYear(k,y)}catch(e){toast('読み込めませんでした');console.error(e)}
+  loadingYears.delete(key); render();
+}
+function filt(ws){return onlyRv?ws.filter(w=>w.rv.length||w.aw.length||w.iv.length||w.sr.length):ws}
+function yearBody(k,y){
+  const all=works(k,y);
+  let h='';
+  if(k==='tv'){
+    for(const [c,mo] of COURS){
+      const ws=filt(all.filter(w=>w.cour===c));
+      const adding=editing&&editing.t==='work'&&editing.isNew&&!editing.top&&editing.y==y&&editing.cour===c;
+      if(!ws.length&&!adding) continue;
+      const cid=`tv-c${y}${c}`;
+      const r=ws.reduce((s,w)=>s+w.rv.length,0), a=ws.reduce((s,w)=>s+w.aw.length,0), iv=ws.reduce((s,w)=>s+w.iv.length,0), sr=ws.reduce((s,w)=>s+w.sr.length,0);
+      h+=`<details class="cour" data-id="${cid}"${op(cid)||(adding?' open':'')}><summary>${c}<span class="months">${mo}</span>${cntHtml(k,ws.length,r,a,iv,sr)}</summary>`;
+      if(openSet.has(cid)||adding){
+        h+=worksHtml(k,y,ws);
+        h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" data-cour="${c}">${ic('plus')}${c}クールに台帳にない作品を追加</button>`;
+      }
+      h+='</details>';
+    }
+  }else{
+    h+=worksHtml(k,y,filt(all));
+    const adding=editing&&editing.t==='work'&&editing.isNew&&!editing.top&&editing.y==y;
+    h+= adding?workForm(editing):`<button class="add" data-act="addWork" data-y="${y}" style="margin-left:14px">${ic('plus')}${y}年に台帳にない作品を追加</button>`;
+  }
+  if(editMode){
+    const hw=hiddenWorks(k,y);
+    if(hw.length){
+      const hid=`${k}-h${y}`;
+      h+=`<details class="cour hid" data-id="${hid}"${op(hid)}><summary>${ic('eye')}一覧から外した作品<span class="cnt">${hw.length}</span></summary><ul class="works">`;
+      for(const [id,t] of hw) h+=`<li style="display:flex;align-items:center;gap:6px;padding:2px 0">${esc(t)}<button class="ib" data-act="unhide" data-id="${id}" data-y="${y}" title="一覧に戻す">${ic('undo')}</button></li>`;
+      h+='</ul></details>';
+    }
+  }
+  return h;
+}
+// 上映時間の区分：30分未満＝短編、60分未満＝中編、それ以上＝長編
+const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
+// 作品名の下に添える監督・スタジオ（監督が3人以上なら「ほか」でまとめる）
+function subLine(w){
+  const ds=(w.dir||'').split('、').filter(Boolean), st=(w.studio||'').split('、').filter(x=>x&&x!=='-');
+  if(!ds.length&&!st.length) return '';
+  const d=ds.length>2?ds.slice(0,2).join('・')+' ほか':ds.join('・');
+  return `<span class="sub">${d?`<span class="sd">${ic('mega')}${esc(d)}</span>`:''}${st.length?`<span class="ss">${ic('studio')}${esc(st[0])}${st.length>1?' ほか':''}</span>`:''}</span>`;
+}
+const fmtMd=md=>md?md.replace(/^0?(\d+)(?:-0?(\d+))?$/,(_,m,d)=>d?`${m}/${d}`:`${m}月`):'';
+function worksHtml(k,y,ws){
+  let h='<ul class="works">';
+  for(const w of ws){
+    if(editing&&editing.t==='work'&&!editing.isNew&&editing.id===w.id){h+='<li>'+workForm(editing)+'</li>';continue}
+    const wid='w-'+w.id;
+    h+=`<li><details class="work" data-id="${wid}" data-w="${w.id}" data-y="${y}"${op(wid)}><summary>${k==='movie'?(w.min?`<span class="len l${lenCls(w.min)[0]}" title="${lenCls(w.min)}（${w.min}分）">${lenCls(w.min)[0]}</span>`:'<span class="len none" title="上映時間不明"></span>'):''}${w.md?`<span class="dt">${fmtMd(w.md)}</span>`:'<span class="dt"></span>'}<span class="t"><span class="tt" title="${esc(w.title)}">${esc(w.title)}${w.added?'<span class="tag">追加</span>':''}${w.soshu?'<span class="tag so">総集編</span>':''}</span>${subLine(w)}</span><span class="meta">${w.rv.length?`<span class="rc" title="レビュー数">${ic('doc')}${w.rv.length}</span>`:''}${w.sr.length?`<span class="rc" title="資料数">${ic('lib')}${w.sr.length}</span>`:''}${w.aw.length?`<span class="aw" title="受賞数">${ic('trophy')}${w.aw.length}</span>`:''}</span><span class="ops"><button class="ib so${w.soshu?' on':''}" data-act="soshu" title="${w.soshu?'総集編の印を外す':'総集編の印を付ける'}">${ic('layers')}</button><button class="ib" data-act="editWork" title="作品を編集">${ic('pen')}</button><button class="ib del" data-act="delWork" title="一覧から外す">${ic('trash')}</button></span></summary>`;
+    if(openSet.has(wid)) h+=workBody(w,y);
+    h+='</details></li>';
+  }
+  return h+'</ul>';
+}
+// 記事の日付：ネット記事は年月日、紙媒体は年
+const artKey=r=>r.date||(r.year?r.year+'-99':'9999');
+const fmtDate=r=>r.date?r.date.replace(/^(\d+)-0?(\d+)-0?(\d+)$/,'$1/$2/$3'):(r.year||'');
+const ART={rv:{name:'レビュー',icon:'doc'},sr:{name:'資料',icon:'lib'}};
+const SRT={web:['ネット記事','globe'],book:['書籍・雑誌','book'],ndl:['NDL','lib']};
+function srLine(r){
+  const t=r.type||'ndl', link=x=>r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${x}</a>`:x;
+  let body='';
+  if(t==='ndl'){
+    const parts=[];
+    if(r.title) parts.push(`「${esc(r.title)}」`);
+    parts.push(`『${esc(r.book)}』`);
+    body=`<span class="ti">${link(parts.join(''))}</span>${r.publisher?` <span class="src">${esc(r.publisher)}</span>`:''}${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}${r.pages?` <span class="y">p.${esc(r.pages)}</span>`:''} <span class="ndl" title="国立国会図書館デジタルコレクション">${ic('lib')}NDL</span>`;
+  }else if(t==='web'){
+    body=`<span class="ti">${link(`「${esc(r.title)}」`)}</span> <span class="src"><span class="ico">${ic('globe')}</span>${esc(r.media)}</span>${r.date||r.year?` <span class="y">${ic('cal')}${esc(fmtDate(r))}</span>`:''}`;
+  }else{
+    body=`<span class="ti">${link(`「${esc(r.title)}」`)}</span> <span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』${r.publisher?esc(r.publisher):''}</span>${r.year?` <span class="y">${ic('cal')}${esc(r.year)}</span>`:''}`;
+  }
+  return `<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic('person')}</span>${esc(r.author)}</span>`:''}${body}</span><span class="ops"><button class="ib" data-act="editArt" data-t="sr" title="資料を編集">${ic('pen')}</button><button class="ib del" data-act="delArt" data-t="sr" title="資料を削除">${ic('trash')}</button></span></li>`;
+}
+function artSection(w,t){
+  const A=ART[t], list=w[t].slice().sort((a,b)=>artKey(a)<artKey(b)?-1:1);
+  if(t==='sr'&&!list.length&&!editMode) return '';
+  let h=`<h3>${ic(A.icon)}${A.name}</h3><ul>`;
+  if(!list.length) h+='<li class="empty">まだありません</li>';
+  for(const r of list){
+    if(editing&&editing.t===t&&editing.id===r.id){h+='<li>'+rvForm(editing)+'</li>';continue}
+    if(t==='sr'){h+=srLine(r);continue}
+    const ti=`「${esc(r.title)}」`;
+    const src=r.type==='web'
+      ? `<span class="src"><span class="ico">${ic('globe')}</span>${esc(r.media)}</span>`
+      : `<span class="src"><span class="ico">${ic('book')}</span>『${esc(r.media)}』${r.publisher?esc(r.publisher):''}</span>`;
+    const d=fmtDate(r);
+    h+=`<li class="rv" data-r="${r.id}"><span class="txt">${r.author?`<span class="au"><span class="ico">${ic(t==='iv'?'mic':'person')}</span>${esc(r.author)}</span>`:''}<span class="ti">${r.url?`<a href="${esc(r.url)}" target="_blank" rel="noopener">${ti}</a>`:ti}</span>${r.inter?` <span class="au"><span class="ico">${ic('person')}</span>聞き手：${esc(r.inter)}</span>`:''} ${src}${d?` <span class="y">${ic('cal')}${esc(d)}</span>`:''}</span><span class="ops"><button class="ib" data-act="editArt" data-t="${t}" title="${A.name}を編集">${ic('pen')}</button><button class="ib del" data-act="delArt" data-t="${t}" title="${A.name}を削除">${ic('trash')}</button></span></li>`;
+  }
+  h+='</ul>';
+  h+= editing&&editing.t===t&&editing.isNew&&editing.w===w.id ? rvForm(editing) : `<button class="add" data-act="addArt" data-t="${t}">${ic('plus')}${A.name}を追加</button>`;
+  return h;
+}
+function workBody(w,y){
+  const aw=w.aw.slice().sort((a,b)=>(a.year||9999)-(b.year||9999));
+  let h='<div class="wbody">';
+  const info=[];
+  info.push(`<span title="${kind==='tv'?'放送開始':'公開日'}">${ic('cal')}${y}${w.md?'/'+fmtMd(w.md).replace('月',''):''}</span>`);
+  if(w.min) info.push(`<span title="上映時間">${ic('clock')}${w.min}分（${lenCls(w.min)}）</span>`);
+  if(w.studio) info.push(`<span title="制作">${ic('studio')}${esc(w.studio)}</span>`);
+  if(w.dir) info.push(`<span title="監督">${ic('mega')}${esc(w.dir)}</span>`);
+  if(w.title!==w.orig) info.push(`<span title="台帳の題名">台帳：${esc(w.orig)}</span>`);
+  h+=`<div class="info">${info.join('')}</div>`;
+  h+=artSection(w,'rv')+artSection(w,'sr');
+  if(aw.length||editMode){
+    h+=`<h3>${ic('trophy')}受賞歴</h3><ul>`;
+    if(!aw.length) h+='<li class="empty">まだありません</li>';
+    for(const a of aw){
+      if(editing&&editing.t==='aw'&&editing.id===a.id){h+='<li>'+awForm(editing)+'</li>';continue}
+      h+=`<li class="awl" data-a="${a.id}"><span class="txt"><span class="ico">${ic('trophy')}</span>${esc(a.name)}${a.prize?` <span class="prize">${esc(a.prize)}</span>`:''}${a.year?` <span class="y">${ic('cal')}${esc(a.year)}</span>`:''}</span><span class="ops"><button class="ib" data-act="editAw" title="受賞歴を編集">${ic('pen')}</button><button class="ib del" data-act="delAw" title="受賞歴を削除">${ic('trash')}</button></span></li>`;
+    }
+    h+='</ul>';
+    h+= editing&&editing.t==='aw'&&editing.isNew&&editing.w===w.id ? awForm(editing) : `<button class="add" data-act="addAw">${ic('plus')}受賞歴を追加</button>`;
+  }
+  return h+'</div>';
+}
+
+/* ---------- フォーム ---------- */
+const val=(e,f)=>esc(e.v&&e.v[f]!=null?e.v[f]:'');
+const btns=`<div class="btns"><button type="button" data-act="cancel">${ic('x')}やめる</button><button type="submit">${ic('check')}決定</button></div>`;
+function workForm(e){
+  const isTv=kind==='tv', yearEditable=e.isNew||e.added;
+  return `<form class="f" data-form="work"><label>作品名<input type="text" name="title" required value="${val(e,'title')}"></label>
+  <label>年<input type="number" name="year" required min="1900" max="2100" value="${esc(e.y||'')}"${yearEditable?'':' readonly title="台帳の作品は年を変えられません"'}></label>
+  ${isTv?`<label>クール<select name="cour">${COURS.map(([c,m])=>`<option value="${c}"${e.cour===c?' selected':''}>${c}（${m}）</option>`).join('')}</select></label>`:''}
+  ${btns}</form>`;
+}
+function rvForm(e){
+  if(e.t==='sr'){
+    const t=(e.v&&e.v.type)||'ndl', sh=(...ks)=>ks.includes(t)?'':' hidden';
+    return `<form class="f" data-form="sr">
+  <div class="seg">${Object.entries(SRT).map(([k,[n,i]])=>`<label><input type="radio" name="type" value="${k}"${t===k?' checked':''}>${ic(i)}${n}</label>`).join('')}</div>
+  <label>${ic('link')}URL<input type="url" name="url" data-req="ndl" placeholder="${t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':'https://（ネット記事は貼ると題名などを自動で入れます）'}" value="${val(e,'url')}"${t==='ndl'?' required':''}></label>
+  <label>${ic('person')}著者名<input type="text" name="author" placeholder="任意" value="${val(e,'author')}"></label>
+  <label><span data-tl>${t==='ndl'?'記事名':'タイトル'}</span><input type="text" name="title" data-req="web book" placeholder="${t==='ndl'?'任意（「」で囲んで表示）':''}" value="${val(e,'title')}"${t==='ndl'?'':' required'}></label>
+  <label data-k="ndl"${sh('ndl')}>${ic('book')}書籍名<input type="text" name="book" data-req="ndl" placeholder="必須（『』で囲んで表示）" value="${val(e,'book')}"${t==='ndl'?' required':''}></label>
+  <label data-k="web book"${sh('web','book')}><span data-ml>${t==='web'?'メディア名':'媒体名'}</span><input type="text" name="media" data-req="web book" value="${val(e,'media')}"${t==='ndl'?'':' required'}></label>
+  <label data-k="book ndl"${sh('book','ndl')}>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
+  <label data-k="book ndl"${sh('book','ndl')}>${ic('cal')}発行年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  <label data-k="web"${sh('web')}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
+  <label data-k="ndl"${sh('ndl')}>ページ<input type="text" name="pages" placeholder="任意（例：12、15、20）" value="${val(e,'pages')}"></label>
+  ${btns}</form>`;
+  }
+  const web=e.v&&e.v.type==='web', iv=false;
+  return `<form class="f" data-form="art"><div class="seg"><label><input type="radio" name="type" value="paper"${web?'':' checked'}>${ic('book')}紙の媒体</label><label><input type="radio" name="type" value="web"${web?' checked':''}>${ic('globe')}ネット</label></div>
+  <label>${ic('link')}URL<input type="url" name="url" placeholder="${web?'https://（貼ると題名などを自動で入れます）':'https://（任意）'}" value="${val(e,'url')}"></label>
+  <label>${ic(iv?'mic':'person')}${iv?'話し手':'著者名'}<input type="text" name="author" value="${val(e,'author')}"${iv?' placeholder="インタビューを受けた人"':''}></label>
+  ${iv?`<label>${ic('person')}聞き手<input type="text" name="inter" placeholder="聞き手・構成（任意）" value="${val(e,'inter')}"></label>`:''}
+  <label>タイトル<input type="text" name="title" required value="${val(e,'title')}"></label>
+  <label><span data-lbl>${web?'メディア名':'媒体名'}</span><input type="text" name="media" required value="${val(e,'media')}"></label>
+  <label data-paper${web?' hidden':''}>出版社<input type="text" name="publisher" value="${val(e,'publisher')}"></label>
+  <label data-paper${web?' hidden':''}>${ic('cal')}発表年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  <label data-web${web?'':' hidden'}>${ic('cal')}発表日<input type="date" name="date" value="${val(e,'date')}"></label>
+  ${btns}</form>`;
+}
+function awForm(e){
+  return `<form class="f" data-form="aw"><label>${ic('trophy')}賞の名前<input type="text" name="name" required value="${val(e,'name')}"></label>
+  <label>部門・結果<input type="text" name="prize" placeholder="例：アニメーション部門 大賞" value="${val(e,'prize')}"></label>
+  <label>${ic('cal')}年<input type="number" name="year" min="1900" max="2100" value="${val(e,'year')}"></label>
+  ${btns}</form>`;
+}
+
+/* ---------- 操作 ---------- */
+function ctx(el){
+  const d=el.closest('details.work'); if(!d) return null;
+  const w=works(kind,d.dataset.y).find(x=>x.id===d.dataset.w);
+  return {y:d.dataset.y,id:d.dataset.w,w};
+}
+function toast(msg,canUndo){
+  const t=$('#toast');$('#toastMsg').textContent=msg;
+  t.querySelector('button').hidden=!canUndo;t.classList.add('show');
+  clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),6000);
+}
+document.addEventListener('click',async ev=>{
+  const b=ev.target.closest('[data-act]'); if(!b) return;
+  const act=b.dataset.act;
+  if(b.closest('summary')){ev.preventDefault();ev.stopPropagation()}
+  const c=ctx(b);
+  switch(act){
+    case 'kind': editing=null; setKind(b.dataset.k); break;
+    case 'edit':
+      editMode=!editMode; editing=null;
+      document.body.classList.toggle('edit',editMode); b.classList.toggle('on',editMode);
+      setStatus(); render(); break;
+    case 'onlyRv': onlyRv=!onlyRv; LS.set('arl-onlyrv',onlyRv); render(); break;
+    case 'showSoshu': showSoshu=!showSoshu; LS.set('arl-soshu',showSoshu); render(); break;
+    case 'soshu': {
+      if(SOSHU[c.id]) delete SOSHU[c.id]; else SOSHU[c.id]=[c.w.orig,String(c.y)];
+      pending['data/soshu.json']=JSON.stringify(SOSHU,null,1); LS.set('arl-pending',pending); scheduleSync(); render();
+      toast(SOSHU[c.id]?`「${c.w.title}」を総集編にしました`:`「${c.w.title}」の総集編の印を外しました`); break;
+    }
+    case 'token': $('#tokenIn').value=CFG.token; $('#tokenDlg').showModal(); break;
+    case 'tokenClose': $('#tokenDlg').close(); break;
+    case 'tokenClear': CFG.token=''; LS.set('arl-cfg',CFG); $('#tokenIn').value=''; setStatus(); break;
+    case 'tokenSave': CFG.token=$('#tokenIn').value.trim(); LS.set('arl-cfg',CFG); $('#tokenDlg').close(); setStatus(); if(Object.keys(pending).length) sync(); break;
+    case 'cancel': editing=null; render(); break;
+    case 'addWork':
+      if(b.dataset.top) editing={t:'work',isNew:true,top:true,y:new Date().getFullYear(),cour:'冬'};
+      else editing={t:'work',isNew:true,y:b.dataset.y,cour:b.dataset.cour||null};
+      render(); break;
+    case 'editWork': editing={t:'work',id:c.id,y:c.y,cour:c.w.cour,added:c.w.added,v:c.w}; render(); break;
+    case 'delWork': {
+      const u=ud(kind,c.y);
+      if(c.w.added){const i=u.add.findIndex(a=>a.id===c.id);undoStack.push({k:kind,y:c.y,type:'add',item:u.add[i],i});u.add.splice(i,1)}
+      else{u.hide.push(c.id);undoStack.push({k:kind,y:c.y,type:'hide',id:c.id})}
+      editing=null; markDirty(kind,c.y); render(); toast(`「${c.w.title}」を一覧から外しました`,true); break;
+    }
+    case 'unhide': {const u=ud(kind,b.dataset.y);u.hide=u.hide.filter(x=>x!==b.dataset.id);markDirty(kind,b.dataset.y);render();break}
+    case 'addArt': editing={t:b.dataset.t,isNew:true,w:c.id,y:c.y,v:{}}; openSet.add('w-'+c.id); render(); break;
+    case 'editArt': {const t=b.dataset.t,id=b.closest('[data-r]').dataset.r; editing={t,id,w:c.id,y:c.y,v:c.w[t].find(r=>r.id===id)}; render(); break}
+    case 'delArt': {
+      const t=b.dataset.t, s=slot(kind,c.y,c.id), id=b.closest('[data-r]').dataset.r, i=s[t].findIndex(r=>r.id===id), item=s[t][i];
+      s[t].splice(i,1); undoStack.push({k:kind,y:c.y,type:t,w:c.id,item,i});
+      markDirty(kind,c.y); render(); toast(`${ART[t].name}「${item.title}」を削除しました`,true); break;
+    }
+    case 'addAw': editing={t:'aw',isNew:true,w:c.id,y:c.y,v:{year:c.y}}; openSet.add('w-'+c.id); render(); break;
+    case 'editAw': {const id=b.closest('[data-a]').dataset.a; editing={t:'aw',id,w:c.id,y:c.y,v:c.w.aw.find(a=>a.id===id)}; render(); break}
+    case 'delAw': {
+      const s=slot(kind,c.y,c.id), id=b.closest('[data-a]').dataset.a, i=s.aw.findIndex(a=>a.id===id), item=s.aw[i];
+      s.aw.splice(i,1); undoStack.push({k:kind,y:c.y,type:'aw',w:c.id,item,i});
+      markDirty(kind,c.y); render(); toast(`受賞歴「${item.name}」を削除しました`,true); break;
+    }
+    case 'undo': {
+      const u=undoStack.pop(); if(!u) break;
+      await ensureYear(u.k,u.y); const d=ud(u.k,u.y);
+      if(u.type==='add') d.add.splice(u.i,0,u.item);
+      else if(u.type==='hide') d.hide=d.hide.filter(x=>x!==u.id);
+      else{const s=slot(u.k,u.y,u.w);s[u.type].splice(u.i,0,u.item)}
+      markDirty(u.k,u.y); render();
+      toast(undoStack.length?'元に戻しました（さらに戻せます）':'元に戻しました',undoStack.length>0);
+      break;
+    }
+  }
+});
+document.addEventListener('change',ev=>{
+  if(ev.target.name==='type'&&ev.target.form.dataset.form==='sr'){
+    const f=ev.target.form, t=ev.target.value;
+    f.querySelectorAll('[data-k]').forEach(x=>x.hidden=!x.dataset.k.split(' ').includes(t));
+    f.querySelectorAll('[data-req]').forEach(x=>x.required=x.dataset.req.split(' ').includes(t));
+    f.querySelector('[data-tl]').textContent=t==='ndl'?'記事名':'タイトル';
+    f.querySelector('[name=title]').placeholder=t==='ndl'?'任意（「」で囲んで表示）':'';
+    f.querySelector('[data-ml]').textContent=t==='web'?'メディア名':'媒体名';
+    f.querySelector('[name=url]').placeholder=t==='ndl'?'必須 https://dl.ndl.go.jp/pid/…':t==='web'?'https://（貼ると題名などを自動で入れます）':'https://（任意）';
+    return;
+  }
+  if(ev.target.name==='type'){
+    const f=ev.target.form, web=ev.target.value==='web';
+    f.querySelector('[data-lbl]').textContent=web?'メディア名':'媒体名';
+    f.querySelectorAll('[data-paper]').forEach(x=>x.hidden=web);
+    f.querySelectorAll('[data-web]').forEach(x=>x.hidden=!web);
+    f.querySelector('[name=url]').placeholder=web?'https://（貼ると題名などを自動で入れます）':'https://（任意）';
+  }
+});
+document.addEventListener('submit',async ev=>{
+  ev.preventDefault();
+  const f=ev.target, fd=Object.fromEntries(new FormData(f)), e=editing; if(!e) return;
+  for(const k in fd) fd[k]=String(fd[k]).trim();
+  if(f.dataset.form==='work'){
+    const y=String(parseInt(fd.year,10)); if(!(+y>1900)) return;
+    if(e.isNew){
+      if(!UIDX[kind][y]) UIDX[kind][y]={};
+      await ensureYear(kind,y);
+      const a={id:'u'+uid(),title:fd.title}; if(kind==='tv') a.cour=fd.cour;
+      ud(kind,y).add.push(a); markDirty(kind,y);
+      openSet.add(`${kind}-d${Math.floor(y/10)*10}`); openSet.add(`${kind}-y${y}`); if(kind==='tv') openSet.add(`tv-c${y}${fd.cour}`);
+      toast(`「${a.title}」を追加しました`);
+      editing={...e,y,cour:fd.cour||e.cour,v:null}; saveOpen(); render();
+      const inp=$('#list form.f input[name=title]'); if(inp){inp.value='';inp.focus()}
+      return;
+    }
+    const u=ud(kind,e.y);
+    if(e.added){
+      const i=u.add.findIndex(a=>a.id===e.id), a=u.add[i];
+      a.title=fd.title; if(kind==='tv') a.cour=fd.cour;
+      if(y!==String(e.y)){
+        u.add.splice(i,1); if(!UIDX[kind][y]) UIDX[kind][y]={}; await ensureYear(kind,y);
+        const s=u.w[e.id]; delete u.w[e.id]; const nu=ud(kind,y); nu.add.push(a); if(s) nu.w[e.id]=s;
+        markDirty(kind,y); openSet.add(`${kind}-d${Math.floor(y/10)*10}`); openSet.add(`${kind}-y${y}`);
+      }
+    }else{
+      const w=works(kind,e.y).find(x=>x.id===e.id), fx={};
+      if(fd.title!==w.orig) fx.title=fd.title;
+      if(kind==='tv'&&fd.cour!==courOf(w.md)) fx.cour=fd.cour;
+      u.fix[e.id]=fx;
+    }
+    markDirty(kind,e.y);
+  }else{
+    const s=slot(kind,e.y,e.w);
+    if(f.dataset.form==='sr'){
+      const t=fd.type, keep={web:['author','title','media','url'],book:['author','title','media','publisher','url'],ndl:['author','title','book','publisher','pages','url']}[t];
+      const r={id:e.isNew?uid():e.id,type:t};
+      for(const k of keep) if(fd[k]) r[k]=fd[k];
+      if(t==='web'&&fd.date){r.date=fd.date;r.year=+fd.date.slice(0,4)}
+      if(t!=='web'&&fd.year) r.year=+fd.year;
+      const L=s.sr; if(e.isNew) L.push(r); else L[L.findIndex(x=>x.id===e.id)]=r;
+    }else if(f.dataset.form==='art'){
+      const web=fd.type==='web';
+      const r={id:e.isNew?uid():e.id,author:fd.author,inter:fd.inter,title:fd.title,type:fd.type,media:fd.media,url:fd.url};
+      if(web){ if(fd.date){r.date=fd.date;r.year=+fd.date.slice(0,4)} }
+      else{ if(fd.publisher) r.publisher=fd.publisher; if(fd.year) r.year=+fd.year }
+      for(const k of ['author','inter','url']) if(!r[k]) delete r[k];
+      const L=s[e.t];
+      if(e.isNew) L.push(r); else L[L.findIndex(x=>x.id===e.id)]=r;
+    }else{
+      const a={id:e.isNew?uid():e.id,name:fd.name,prize:fd.prize,year:fd.year?+fd.year:''};
+      if(!a.prize) delete a.prize; if(!a.year) delete a.year;
+      if(e.isNew) s.aw.push(a); else s.aw[s.aw.findIndex(x=>x.id===e.id)]=a;
+    }
+    markDirty(kind,e.y);
+  }
+  editing=null; saveOpen(); render();
+});
+function saveOpen(){LS.set('arl-open',[...openSet].slice(-300))}
+document.addEventListener('toggle',ev=>{
+  const d=ev.target; if(!(d instanceof HTMLDetailsElement)||!d.dataset.id) return;
+  const id=d.dataset.id;
+  if(d.open===openSet.has(id)) return;
+  if(d.open) openSet.add(id); else openSet.delete(id);
+  let closedOther=false;
+  if(d.open&&d.classList.contains('dec')){
+    for(const x of [...openSet]) if(x!==id&&x.startsWith(kind+'-d')){openSet.delete(x);closedOther=true}
+  }
+  saveOpen();
+  if(!d.open) return;
+  if(d.classList.contains('work')){const c=ctx(d); if(c&&c.w&&!d.querySelector('.wbody')) d.insertAdjacentHTML('beforeend',workBody(c.w,c.y))}
+  else if(d.classList.contains('yr')){const y=d.dataset.y; if(!(CAT[kind+'/'+y]&&UD[kind+'/'+y])) {render();loadYear(kind,y)} else render()}
+  else{
+    render();
+    // 上の年代を閉じて位置がずれたら、開いた年代の見出しが画面の上に来るようにする
+    if(closedOther){const el=document.querySelector(`details.dec[data-id="${id}"]`); if(el&&el.getBoundingClientRect().top<0) el.scrollIntoView({block:'start'})}
+  }
+},true);
+/* ネット記事：URL を入れると題名・サイト名・著者・日付を自動で入れる（Microlink の無料枠。空いている欄だけ埋める） */
+let metaTimer=null;
+document.addEventListener('input',ev=>{
+  const u=ev.target; if(u.name!=='url'||!u.form) return;
+  const f=u.form, t=f.querySelector('input[name=type]:checked');
+  if(!t||t.value!=='web') return;
+  clearTimeout(metaTimer);
+  if(!/^https?:\/\/[^\s]+\.[^\s]+/.test(u.value.trim())) return;
+  metaTimer=setTimeout(()=>fillMeta(f,u.value.trim()),500);
+});
+function metaNote(f,msg){
+  let n=f.querySelector('.metast');
+  if(!n){n=document.createElement('div');n.className='metast';f.querySelector('[name=url]').closest('label').after(n)}
+  n.textContent=msg;
+}
+async function fillMeta(f,url){
+  metaNote(f,'記事の情報を読み込み中…');
+  try{
+    const r=await fetch('https://api.microlink.io/?url='+encodeURIComponent(url));
+    const j=await r.json();
+    if(j.status!=='success') throw new Error(j.message||r.status);
+    if(f.querySelector('[name=url]').value.trim()!==url) return;
+    const d=j.data||{}, got=[];
+    let site=(d.publisher||'').trim(), title=(d.title||'').trim();
+    if(!site){try{site=new URL(url).hostname.replace(/^www\./,'')}catch(e){}}
+    // 題名の末尾についたサイト名（「題名 | サイト名」など）を外す
+    for(const sep of [' | ','｜',' - ',' – ',' — ',' :: ','│']){
+      const i=title.lastIndexOf(sep);
+      if(i>0){const tail=title.slice(i+sep.length).trim(); if(site&&(tail.includes(site)||site.includes(tail))){title=title.slice(0,i).trim();break}}
+    }
+    const put=(name,v,label)=>{const x=f.querySelector(`[name=${name}]`); if(x&&v&&!x.value.trim()){x.value=v;got.push(label)}};
+    put('title',title,'題名'); put('media',site,'サイト名');
+    if(d.author&&!/^https?:/.test(d.author)) put('author',d.author.trim(),'著者');
+    if(d.date){const dt=new Date(d.date); if(!isNaN(dt)) put('date',`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`,'日付')}
+    metaNote(f,got.length?`自動で入れました：${got.join('・')}（違っていたら直してください）`:'自動で入れられる情報がありませんでした（入れ済みの欄はそのままです）');
+  }catch(e){
+    metaNote(f,'記事の情報を読み込めませんでした。手で入れてください（'+e.message+'）');
+  }
+}
+window.addEventListener('hashchange',()=>{const k=location.hash.slice(1);setKind(k==='movie'||k==='tv'?k:null)});
+
+/* ---------- 起動 ---------- */
+(async()=>{
+  try{[CIDX,UIDX,SOSHU]=await Promise.all([getFile('catalog/index.json'),getFile('data/index.json',true),getFile('data/soshu.json',true).catch(()=>({})),getFile('data/has.json',true).catch(()=>({}))]).then(a=>{HAS=a[3]||{};return a.slice(0,3)})}catch(e){console.error(e)}
+  SOSHU=SOSHU||{};
+  CIDX=CIDX||{movie:{},tv:{}};
+  UIDX=UIDX||{}; UIDX.movie=UIDX.movie||{}; UIDX.tv=UIDX.tv||{};
+  const sum=o=>Object.values(o).reduce((a,b)=>a+b,0);
+  $('#nMovie').textContent=sum(CIDX.movie).toLocaleString(); $('#nTv').textContent=sum(CIDX.tv).toLocaleString();
+  setStatus();
+  const k=location.hash.slice(1); setKind(k==='movie'||k==='tv'?k:null);
+  if(CFG.token&&Object.keys(pending).length) scheduleSync();
+})();
+</script>
+</body>
+</html>
