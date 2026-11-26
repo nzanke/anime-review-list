@@ -195,11 +195,14 @@ def main():
         save(P('data', 'anilist-match.json'), dict(sorted(match.items())), compact=True)
         save(P('data', 'anilist-unsure.json'), unsure)
         save(P('data', 'anilist-done.json'), sorted(done), compact=True)
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        import split_thumbs
+        split_thumbs.split(); split_thumbs.stamp()
     def commit(msg):
         save_all()
         if not os.environ.get('GITHUB_ACTIONS'):
             return
-        subprocess.run('git add catalog/thumbs.json data/anilist-*.json && (git diff --cached --quiet || git commit -q -m "' + msg + '") '
+        subprocess.run('git add catalog/thumbs.json catalog/thumbs index.html edit.html data/anilist-*.json && (git diff --cached --quiet || git commit -q -m "' + msg + '") '
                        '&& for i in 1 2 3; do git pull --rebase -q && git push -q && break; sleep 5; done', shell=True)
         last_commit[0] = time.time()
     for b in range(0, len(todo), BATCH):

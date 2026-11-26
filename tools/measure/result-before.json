@@ -1,0 +1,249 @@
+[
+ {
+  "場面": "閲覧トップを開く",
+  "時間ms": [
+   128,
+   112,
+   88,
+   102,
+   84
+  ],
+  "中央値ms": 102,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 5,
+  "圧縮前KB": 83.7,
+  "圧縮後KB": 59.1,
+  "10Mbps転送秒（計算値）": 0.05,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/data/has.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 59.1,
+  "表示までの10Mbps転送秒（計算値）": 0.05
+ },
+ {
+  "場面": "閲覧で検索（スマホ）",
+  "時間ms": [
+   407,
+   374,
+   392,
+   352,
+   351
+  ],
+  "中央値ms": 374,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/catalog/search-titles.json（546.9KB／圧縮後176.2KB）",
+   "/catalog/thumbs.json（233.3KB／圧縮後103.5KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 7,
+  "圧縮前KB": 863.9,
+  "圧縮後KB": 338.8,
+  "10Mbps転送秒（計算値）": 0.28,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/catalog/search-titles.json",
+   "/catalog/thumbs.json",
+   "/data/has.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 338.8,
+  "表示までの10Mbps転送秒（計算値）": 0.28
+ },
+ {
+  "場面": "閲覧で検索（PC）",
+  "時間ms": [
+   412,
+   434,
+   386,
+   398,
+   450
+  ],
+  "中央値ms": 412,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/catalog/search-staff.json（424.7KB／圧縮後93.2KB）",
+   "/catalog/search-titles.json（546.9KB／圧縮後176.2KB）",
+   "/catalog/thumbs.json（233.3KB／圧縮後103.5KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 8,
+  "圧縮前KB": 1288.6,
+  "圧縮後KB": 432.1,
+  "10Mbps転送秒（計算値）": 0.35,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/catalog/search-staff.json",
+   "/catalog/search-titles.json",
+   "/catalog/thumbs.json",
+   "/data/has.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 432.1,
+  "表示までの10Mbps転送秒（計算値）": 0.35
+ },
+ {
+  "場面": "閲覧の個別ページ",
+  "時間ms": [
+   139,
+   95,
+   133,
+   94,
+   108
+  ],
+  "中央値ms": 108,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/catalog/movie/1981.json（2.1KB／圧縮後1.1KB）",
+   "/catalog/thumbs.json（233.3KB／圧縮後103.5KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 7,
+  "圧縮前KB": 319.1,
+  "圧縮後KB": 163.8,
+  "10Mbps転送秒（計算値）": 0.13,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/catalog/movie/1981.json",
+   "/catalog/thumbs.json",
+   "/data/has.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 163.8,
+  "表示までの10Mbps転送秒（計算値）": 0.13
+ },
+ {
+  "場面": "閲覧で検索（スマホ・10Mbps模擬）",
+  "時間ms": [
+   2242,
+   2141,
+   2178,
+   2140,
+   2120
+  ],
+  "中央値ms": 2141,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/catalog/search-titles.json（546.9KB／圧縮後176.2KB）",
+   "/catalog/thumbs.json（233.3KB／圧縮後103.5KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 7,
+  "圧縮前KB": 863.9,
+  "圧縮後KB": 338.8,
+  "10Mbps転送秒（計算値）": 0.28,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/catalog/search-titles.json",
+   "/catalog/thumbs.json",
+   "/data/has.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 338.8,
+  "表示までの10Mbps転送秒（計算値）": 0.28
+ },
+ {
+  "場面": "閲覧の個別ページ（10Mbps模擬）",
+  "時間ms": [
+   479,
+   476,
+   476,
+   459,
+   479
+  ],
+  "中央値ms": 476,
+  "ファイル": [
+   "/（24.4KB／圧縮後8.9KB）",
+   "/catalog/movie/1981.json（2.1KB／圧縮後1.1KB）",
+   "/catalog/thumbs.json（233.3KB／圧縮後103.5KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/movie/1981.json（0.0KB／圧縮後0.0KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 8,
+  "圧縮前KB": 319.1,
+  "圧縮後KB": 163.8,
+  "10Mbps転送秒（計算値）": 0.13,
+  "表示までに読み終えたファイル": [
+   "/",
+   "/catalog/movie/1981.json",
+   "/catalog/thumbs.json",
+   "/data/has.json",
+   "/data/movie/1981.json",
+   "/data/soshu.json",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 163.8,
+  "表示までの10Mbps転送秒（計算値）": 0.13
+ },
+ {
+  "場面": "編集で年を開く",
+  "時間ms": [
+   371,
+   350,
+   307,
+   296,
+   306
+  ],
+  "中央値ms": 307,
+  "ファイル": [
+   "/catalog/index.json（1.6KB／圧縮後0.5KB）",
+   "/catalog/movie/2024.json（8.5KB／圧縮後3.9KB）",
+   "/data/has.json（0.6KB／圧縮後0.2KB）",
+   "/data/index.json（1.9KB／圧縮後0.2KB）",
+   "/data/soshu.json（13.2KB／圧縮後4.4KB）",
+   "/edit.html（55.5KB／圧縮後18.0KB）",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2（22.6KB／圧縮後22.6KB）",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2（22.9KB／圧縮後22.9KB）"
+  ],
+  "件数": 8,
+  "圧縮前KB": 126.9,
+  "圧縮後KB": 72.8,
+  "10Mbps転送秒（計算値）": 0.06,
+  "表示までに読み終えたファイル": [
+   "/catalog/index.json",
+   "/catalog/movie/2024.json",
+   "/data/has.json",
+   "/data/index.json",
+   "/data/soshu.json",
+   "/edit.html",
+   "/lib/fonts/biz-udgothic-latin-400-normal.woff2",
+   "/lib/fonts/biz-udgothic-latin-700-normal.woff2"
+  ],
+  "表示までの圧縮後KB": 72.8,
+  "表示までの10Mbps転送秒（計算値）": 0.06
+ }
+]

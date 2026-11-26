@@ -32,7 +32,7 @@ jobs:
         run: |
           git config user.name nzanke
           git config user.email nzanke@users.noreply.github.com
-          git add catalog/thumbs.json data/anilist-*.json 2>/dev/null || true
+          git add catalog/thumbs.json catalog/thumbs index.html edit.html data/anilist-*.json 2>/dev/null || true
           git diff --cached --quiet || git commit -m "AniListの表紙画像の照合結果を保存"
           for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
       - name: 残りがあれば次の回を始める

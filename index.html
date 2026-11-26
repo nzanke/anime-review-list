@@ -177,11 +177,14 @@ const courOf=md=>{let m=parseInt(md,10),d=parseInt((md||'').split('-')[1],10)||0
 const lenCls=m=>m<30?'短編':m<60?'中編':'長編';
 const kindOf=id=>id[0]==='f'?'movie':'tv';
 const OPT=Object.assign({fTitle:true,fDir:false,fStudio:false,movie:true,tv:true,onlyArt:false,soshu:true},LS.get('arv-opts',{}));
+// 台帳・表紙を作り直すたびに tools/split_thumbs.py が書き換える目印（古い控えと混ざらないように）
+const CATV='20261126-1927';
 let TITLES=null, STAFF=null, HAS={}, SOSHU={}, THUMBS=null;
 // 表紙画像は AniList のもの（大きさ：small／medium／large）
-const thumb=(id,size)=>THUMBS&&THUMBS[id]?`https://s4.anilist.co/file/anilistcdn/media/anime/cover/${size}/${THUMBS[id]}`:'';
+const thumb=(id,size,map=THUMBS)=>map&&map[id]?`https://s4.anilist.co/file/anilistcdn/media/anime/cover/${size}/${map[id]}`:'';
 const cache={};
-const getJSON=async(p,fresh)=>{if(cache[p]) return cache[p];const r=await fetch(p,{cache:fresh?'no-cache':'default'});if(r.status===404) return cache[p]=null;if(!r.ok) throw new Error(r.status);return cache[p]=await r.json()};
+// 読み込み中のものも控えておき、同じファイルを二重に読まない
+const getJSON=(p,fresh)=>cache[p]||(cache[p]=fetch(p.startsWith('catalog/')?p+'?v='+CATV:p,{cache:fresh?'no-cache':'default'}).then(r=>{if(r.status===404) return null;if(!r.ok) throw new Error(r.status);return r.json()}).catch(e=>{delete cache[p];throw e}));
 
 /* ---------- 文字のゆれをそろえる（全角半角・大文字小文字・カタカナ／ひらがな・空白や記号） ---------- */
 const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g,c=>String.fromCharCode(c.charCodeAt(0)-0x60)).replace(/[\s・･\.,、。!?！？「」『』【】\[\]()（）〈〉〜~\-–—―:：;；'"’”/／]/g,'');
@@ -189,12 +192,18 @@ const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[ァ-ヶ]/g
 /* ---------- 検索 ---------- */
 let shown=0, hits=[];
 async function ensureIndex(){
+  // 結果を出すのに要るのは作品名の索引（監督・スタジオで探すときはその索引も）。表紙と、PCで行に添える監督・スタジオはあとから
   const ps=[];
-  if(!THUMBS) ps.push(getJSON('catalog/thumbs.json').then(d=>{THUMBS=d||{}}).catch(()=>{THUMBS={}}));
   if(!TITLES) ps.push(getJSON('catalog/search-titles.json').then(d=>{TITLES=d.map(r=>({id:r[0],title:r[1],date:r[2],min:r[3],n:norm(r[1])}))}));
-  if((OPT.fDir||OPT.fStudio||matchMedia('(min-width:641px)').matches)&&!STAFF) ps.push(getJSON('catalog/search-staff.json').then(d=>{STAFF={};for(const r of d) STAFF[r[0]]={dir:r[1],studio:r[2],nd:norm(r[1]),ns:norm(r[2])}}));
+  if((OPT.fDir||OPT.fStudio)&&!STAFF) ps.push(loadStaff());
   if(ps.length){$('#info').textContent='索引を読み込み中…';await Promise.all(ps)}
+  if(!THUMBS) getJSON('catalog/thumbs.json').then(d=>{THUMBS=d||{};refreshRows()}).catch(()=>{THUMBS={}});
+  if(!STAFF&&matchMedia('(min-width:641px)').matches) loadStaff().then(refreshRows);
 }
+let staffP=null;
+function loadStaff(){return staffP=staffP||getJSON('catalog/search-staff.json').then(d=>{const m={};for(const r of d) m[r[0]]={dir:r[1],studio:r[2],nd:norm(r[1]),ns:norm(r[2])};STAFF=m})}
+// あとから届いた表紙・監督・スタジオを、表示中の行に差し込む
+function refreshRows(){if(!shown) return;$('#results').innerHTML=hits.slice(0,shown).map(rowHtml).join('')}
 function allWorks(){
   // 台帳の作品に、編集画面で追加した作品（has.json の6番目に題名）を足す
   const extra=Object.entries(HAS).filter(([id,v])=>v[5]).map(([id,v])=>({id,title:v[5],date:v[1],min:0,n:norm(v[5]),k:v[0]}));
@@ -278,8 +287,8 @@ async function showWork(k,y,id){
   if(w.min) facts.push([ic('clock')+'上映時間',`${w.min}分（${lenCls(w.min)}）`]);
   if(w.dir) facts.push([ic('mega')+'監督',esc(w.dir)]);
   if(w.studio&&w.studio!=='-') facts.push([ic('studio')+'制作',esc(w.studio)]);
-  if(!THUMBS){try{THUMBS=await getJSON('catalog/thumbs.json')||{}}catch(e){THUMBS={}}}
-  const pt=thumb(id,'medium');
+  let tmap=THUMBS; if(!tmap||!tmap[id]){try{tmap=await getJSON(`catalog/thumbs/${k}/${y}.json`)||{}}catch(e){tmap={}}}
+  const pt=thumb(id,'medium',tmap);
   let h=`<a class="back" href="#">${ic('undo')}検索に戻る</a>
   <div class="wh${pt?' hasp':''}">${pt?`<img class="poster" src="${pt}" alt="">`:''}<span class="kind">${ic(k==='tv'?'tv':'film')}${k==='tv'?'テレビアニメ':'アニメ映画'}${SOSHU[id]?'<span class="tag">総集編</span>':''}</span><h2>${esc(w.title)}</h2>
   <dl class="facts">${facts.map(([a,b])=>`<dt>${a}</dt><dd>${b}</dd>`).join('')}</dl></div>`;
@@ -314,7 +323,7 @@ document.querySelectorAll('[data-o]').forEach(cb=>{
 (async()=>{
   try{[HAS,SOSHU]=await Promise.all([getJSON('data/has.json',true),getJSON('data/soshu.json',true)])}catch(e){}
   HAS=HAS||{}; SOSHU=SOSHU||{};
-  $('#q').value=LS.get('arv-q','');
+  if(!$('#q').value) $('#q').value=LS.get('arv-q','');  // 読み込み中に入力された文字は消さない
   if(location.hash.startsWith('#/')) route();
   search();
 })();

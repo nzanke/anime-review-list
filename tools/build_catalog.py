@@ -39,11 +39,13 @@ for wid, era, title, date, studio, director in rows:
     if kind == 'movie': row.append(minutes.get(wid, 0))
     out[kind].setdefault(m.group(1), []).append(row)
 
-if os.path.isdir(root):
-    shutil.rmtree(root)
+# 作品一覧のフォルダだけを作り直す（表紙の一覧 thumbs.json など、ほかの処理が作るファイルは残す）
+for kind in ('movie', 'tv'):
+    if os.path.isdir(os.path.join(root, kind)):
+        shutil.rmtree(os.path.join(root, kind))
 index = {}
 for kind, years in out.items():
-    os.makedirs(os.path.join(root, kind))
+    os.makedirs(os.path.join(root, kind), exist_ok=True)
     index[kind] = {}
     for y, ws in years.items():
         ws.sort(key=lambda w: (w[2] or '99', w[1]))
@@ -62,4 +64,9 @@ for name, data in (('search-titles.json', titles), ('search-staff.json', staff))
         json.dump(data, f, ensure_ascii=False, separators=(',', ':'))
 with open(os.path.join(root, 'index.json'), 'w', encoding='utf-8') as f:
     json.dump(index, f, ensure_ascii=False, separators=(',', ':'))
+# 表紙の一覧を年ごとに分け、ページの読み込みの目印を付け直す
+import importlib.util
+_spec = importlib.util.spec_from_file_location('split_thumbs', os.path.join(here, 'split_thumbs.py'))
+_st = importlib.util.module_from_spec(_spec); _spec.loader.exec_module(_st)
+_st.split(); _st.stamp()
 print('上映時間あり', len(minutes)); print({k: (len(v), sum(v.values())) for k, v in index.items()})
